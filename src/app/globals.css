@@ -605,6 +605,33 @@ html[lang="ru"] .hero h1 {
   margin-top: clamp(40px, 6vw, 64px);
   padding: 0;
 }
+.cp-eras {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 2vw, 20px);
+  margin-top: 22px;
+}
+.cp-eras figure {
+  margin: 0;
+}
+.cp-eras img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 34px rgba(13, 16, 51, 0.14);
+}
+.cp-eras figcaption {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-40);
+}
+@media (max-width: 720px) {
+  .cp-eras {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 .cp-sec h2 {
   font-size: clamp(21px, 2.6vw, 28px);
   margin-bottom: 14px;

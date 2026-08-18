@@ -61,6 +61,19 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
       </section>
 
       <section className="cp-sec">
+        <h2>{t.erasH}</h2>
+        <p>{t.erasNote}</p>
+        <div className="cp-eras">
+          {t.eras.map((e) => (
+            <figure key={e.img}>
+              <img src={e.img} alt={e.cap} width={500} height={693} loading="lazy" />
+              <figcaption>{`// ${e.cap}`}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section className="cp-sec">
         <h2>{t.stackH}</h2>
         <div className="cl-stack">
           {t.stack.map((tech) => (
