@@ -160,14 +160,34 @@ function HeroField() {
     colA.needsUpdate = true;
   }, [dark, sim]);
 
-  const mouse = useRef({ x: 0, y: 0 });
+  // на мыши поле реагирует на ховер всегда; на таче — чисто фон,
+  // разлетается только пока палец на экране (свайп), без фантомных точек
+  const mouse = useRef({ x: 0, y: 0, active: true });
   useEffect(() => {
-    const onMove = (e: PointerEvent) => {
+    const coarse = isCoarse();
+    if (coarse) mouse.current.active = false;
+    const put = (e: PointerEvent) => {
       mouse.current.x = (e.clientX / innerWidth) * 2 - 1;
       mouse.current.y = -((e.clientY / innerHeight) * 2 - 1);
     };
+    const onMove = (e: PointerEvent) => put(e);
+    const onDown = (e: PointerEvent) => {
+      if (coarse) mouse.current.active = true;
+      put(e);
+    };
+    const onUp = () => {
+      if (coarse) mouse.current.active = false;
+    };
     window.addEventListener("pointermove", onMove, { passive: true });
-    return () => window.removeEventListener("pointermove", onMove);
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
   }, []);
 
   useFrame((f, dt) => {
@@ -194,11 +214,16 @@ function HeroField() {
       p.position.set(0, 0.22 * viewport.height * depthK, -FIELD.depth);
     else p.position.set(0.21 * viewport.width * depthK, 0, -FIELD.depth);
 
-    // курсор в локальных координатах поля
+    // курсор в локальных координатах поля; неактивен — уводим за горизонт
+    const touchLive = mouse.current.active;
     const halfH = viewport.height * 0.5 * depthK;
     const halfW = viewport.width * 0.5 * depthK;
-    const mx = (mouse.current.x * halfW - p.position.x) / S;
-    const my = (mouse.current.y * halfH - p.position.y) / S;
+    const mx = touchLive
+      ? (mouse.current.x * halfW - p.position.x) / S
+      : 1e4;
+    const my = touchLive
+      ? (mouse.current.y * halfH - p.position.y) / S
+      : 1e4;
 
     const posA = sim.geo.attributes.position;
     const arr = posA.array as Float32Array;
