@@ -348,9 +348,10 @@ function Composition() {
   const sideGeo = useShearedGeometry(BAR.side);
   const midGeo = useShearedGeometry(BAR.mid);
   const shadowTex = useShadowTexture();
-  // стекло преломляет «фон» — ночью он чернильный, не белый
+  // стекло преломляет «фон»: ночью не чернильный (иначе брусок сливается
+  // с тёмной страницей в чёрный силуэт), а подсвеченный синим
   const glassBg = useMemo(
-    () => new THREE.Color(dark ? "#0a0e2a" : "#ffffff"),
+    () => new THREE.Color(dark ? "#3d4cae" : "#ffffff"),
     [dark]
   );
 
@@ -734,8 +735,8 @@ function Composition() {
             ior={1.4}
             chromaticAberration={0.28}
             anisotropicBlur={0.35}
-            color="#5b93ff"
-            attenuationColor="#0C5EFF"
+            color={dark ? "#7fa6ff" : "#5b93ff"}
+            attenuationColor={dark ? "#2E74FF" : "#0C5EFF"}
             attenuationDistance={1.4}
             samples={isCoarse() ? 4 : 6}
             resolution={isCoarse() ? 256 : 512}
