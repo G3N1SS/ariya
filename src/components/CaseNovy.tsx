@@ -1,10 +1,14 @@
 import { dict, contacts, type Locale } from "@/lib/dict";
+import CaseGuide from "./CaseGuide";
 
 // Страница кейса «Новый уровень»: общая для обеих локалей, тексты из dict
 export default function CaseNovy({ locale }: { locale: Locale }) {
   const t = dict[locale].casePage;
   return (
     <main className="cpage">
+      {/* якорь большого Призмы в шапке: гид меряет его и стартует отсюда */}
+      <div className="cp-pr-anchor" aria-hidden="true" />
+      <CaseGuide t={t.guide} />
       <a className="cp-back" href={t.backHref}>
         {t.back}
       </a>
@@ -24,7 +28,7 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         {t.play}
       </a>
 
-      <div className="cp-shots">
+      <div className="cp-shots" data-cg="shots">
         {t.shots.map((sh) => (
           <figure key={sh.img}>
             <img src={sh.img} alt={sh.cap} width={500} height={693} loading="lazy" />
@@ -33,12 +37,12 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         ))}
       </div>
 
-      <section className="cp-sec">
+      <section className="cp-sec" data-cg="task">
         <h2>{t.taskH}</h2>
         <p>{t.taskText}</p>
       </section>
 
-      <section className="cp-sec">
+      <section className="cp-sec" data-cg="built">
         <h2>{t.builtH}</h2>
         <ul className="cp-built">
           {t.built.map((b) => (
@@ -47,7 +51,7 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         </ul>
       </section>
 
-      <section className="cp-sec">
+      <section className="cp-sec" data-cg="flow">
         <h2>{t.flowH}</h2>
         <div className="cp-flow">
           {t.flow.map((f) => (
@@ -60,7 +64,7 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="cp-sec">
+      <section className="cp-sec" data-cg="eras">
         <h2>{t.erasH}</h2>
         <p>{t.erasNote}</p>
         <div className="cp-eras">
@@ -73,7 +77,7 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="cp-sec">
+      <section className="cp-sec" data-cg="stack">
         <h2>{t.stackH}</h2>
         <div className="cl-stack">
           {t.stack.map((tech) => (
@@ -82,7 +86,7 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="cp-cta">
+      <section className="cp-cta" data-cg="cta">
         <b>{t.ctaH}</b>
         <a
           className="btn btn-primary"

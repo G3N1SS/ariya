@@ -533,9 +533,59 @@ html[lang="ru"] .hero h1 {
 
 /* ── страница кейса ── */
 .cpage {
+  position: relative;
   max-width: 880px;
   margin: 0 auto;
   padding: 110px 24px 90px;
+}
+/* якорь большого Призмы в шапке кейса: гид стартует из этого бокса */
+.cp-pr-anchor {
+  position: absolute;
+  top: 92px;
+  right: 10px;
+  width: clamp(190px, 23vw, 258px);
+  aspect-ratio: 0.93;
+  pointer-events: none;
+}
+/* обёртка гида кейса: канвас постоянного размера, сжатие — чистый transform */
+.cg-wrap {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+/* специфичность выше .pg-bubble: его right/bottom здесь должны молчать */
+.pg-bubble.cg-greet {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  z-index: 41;
+  pointer-events: none;
+  border-radius: 14px 4px 14px 14px;
+  transition: opacity 0.35s;
+  will-change: transform, opacity;
+}
+.pg-bubble.cg-bub {
+  position: fixed;
+  right: 132px;
+  bottom: 150px;
+  left: auto;
+  top: auto;
+  pointer-events: auto;
+  z-index: 41;
+}
+@media (max-width: 899px) {
+  .cg-wrap,
+  .cg-greet,
+  .cg-bub,
+  .cp-pr-anchor {
+    display: none;
+  }
 }
 .cp-back {
   font-family: var(--font-mono);
@@ -572,6 +622,13 @@ html[lang="ru"] .hero h1 {
   font-size: clamp(16.5px, 1.7vw, 18.5px);
   max-width: 62ch;
   margin-bottom: 22px;
+}
+/* на десктопе справа в шапке живёт большой Призма — тексту туда нельзя */
+@media (min-width: 900px) {
+  .cpage h1,
+  .cp-lead {
+    max-width: min(62ch, calc(100% - 290px));
+  }
 }
 .cp-shots {
   display: grid;

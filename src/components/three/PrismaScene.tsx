@@ -70,15 +70,15 @@ function ramp(stops: [number, THREE.Color][], t: number, out: THREE.Color) {
 
 type Mode = "lab" | "lost" | "guide";
 
-function Mascot({ mode }: { mode: Mode }) {
+function Mascot({ mode, skin0 }: { mode: Mode; skin0?: Skin }) {
   const group = useRef<THREE.Group>(null!);
   const eyes = useRef<THREE.Group>(null!);
   const eyeL = useRef<THREE.Mesh>(null!);
   const eyeR = useRef<THREE.Mesh>(null!);
   const shadow = useRef<THREE.Mesh>(null!);
-  const [skin, setSkin] = useState<Skin>("candy");
+  const [skin, setSkin] = useState<Skin>(skin0 ?? "candy");
   // рефы скина «нового уровня»: пламя джетпака, огонёк и кольца антенны
-  const skinRef = useRef<Skin>("candy");
+  const skinRef = useRef<Skin>(skin0 ?? "candy");
   const flameL = useRef<THREE.Mesh>(null);
   const flameR = useRef<THREE.Mesh>(null);
   const trail = useRef<THREE.Mesh>(null);
@@ -713,7 +713,13 @@ function Mascot({ mode }: { mode: Mode }) {
   );
 }
 
-export default function PrismaScene({ mode = "lab" }: { mode?: Mode }) {
+export default function PrismaScene({
+  mode = "lab",
+  skin,
+}: {
+  mode?: Mode;
+  skin?: Skin;
+}) {
   const guide = mode === "guide";
   return (
     <div className="prisma-canvas">
@@ -726,7 +732,7 @@ export default function PrismaScene({ mode = "lab" }: { mode?: Mode }) {
         }
         gl={{ alpha: true, antialias: true }}
       >
-        <Mascot mode={mode} />
+        <Mascot mode={mode} skin0={skin} />
       </Canvas>
     </div>
   );
