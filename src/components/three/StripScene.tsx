@@ -3,6 +3,7 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three-stdlib";
 import { useEffect, useMemo, useRef } from "react";
 import {
   makePrismaBody,
@@ -17,14 +18,19 @@ import {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-// раскладка мира ленты: 4 вышки эпох по фракциям ширины, высота растёт к 6G
-const XS = [-0.345, -0.115, 0.115, 0.345];
-const TOPS = [-0.95, -0.35, 0.3, 1.05];
+// раскладка мира: 5 эпох связи из игры, высота и техника растут к 6G.
+// фракции ширины продублированы в CaseStrip (лейблы) — держать в синхроне
+const XS = [-0.38, -0.19, 0, 0.19, 0.38];
+const TOPS = [-1.2, -0.62, -0.06, 0.5, 1.08];
 const FLOOR = -2.4;
 const BODY_S = 0.62;
 const REST = 0.6;
 const JUMP = 0.8;
-const BACK = 1.2;
+const BACK = 1.35;
+
+const STEEL = "#211d4d";
+const STEEL_L = "#2c2761";
+const PLASTIC = "#3d3a7e";
 
 function useGlowTex() {
   return useMemo(() => {
@@ -62,6 +68,188 @@ function useStars(seedShift: number) {
   }, [seedShift]);
 }
 
+// провисший провод 2G: трубка по квадратичной кривой влево за кадр
+function useWire(x0: number, y0: number, len: number, sag: number) {
+  return useMemo(
+    () =>
+      new THREE.TubeGeometry(
+        new THREE.QuadraticBezierCurve3(
+          new THREE.Vector3(x0, y0, 0),
+          new THREE.Vector3(x0 - len / 2, y0 - sag, 0),
+          new THREE.Vector3(x0 - len, y0 - sag * 0.35, 0)
+        ),
+        18,
+        0.013,
+        6
+      ),
+    [x0, y0, len, sag]
+  );
+}
+
+// ── вышки эпох: у каждой свой узнаваемый силуэт ──
+function Pole2G({ top }: { top: number }) {
+  const wireA = useWire(-0.44, top + 0.02, 6, 0.55);
+  const wireB = useWire(-0.3, top - 0.3, 6, 0.7);
+  const ins = [-0.4, -0.18, 0.18, 0.4];
+  return (
+    <>
+      {/* деревянный столб с двумя траверсами и изоляторами */}
+      <mesh position={[0, (top + FLOOR) / 2, 0]}>
+        <cylinderGeometry args={[0.055, 0.08, top - FLOOR, 8]} />
+        <meshStandardMaterial color="#2b2352" metalness={0.2} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, top, 0]}>
+        <boxGeometry args={[0.96, 0.07, 0.09]} />
+        <meshStandardMaterial color={STEEL_L} metalness={0.3} roughness={0.6} />
+      </mesh>
+      <mesh position={[0, top - 0.32, 0]}>
+        <boxGeometry args={[0.68, 0.06, 0.08]} />
+        <meshStandardMaterial color={STEEL_L} metalness={0.3} roughness={0.6} />
+      </mesh>
+      {ins.map((x) => (
+        <mesh key={`a${x}`} position={[x, top + 0.07, 0]}>
+          <sphereGeometry args={[0.035, 8, 8]} />
+          <meshBasicMaterial color="#8d93c4" />
+        </mesh>
+      ))}
+      {ins.slice(1, 3).map((x) => (
+        <mesh key={`b${x}`} position={[x * 1.6, top - 0.25, 0]}>
+          <sphereGeometry args={[0.03, 8, 8]} />
+          <meshBasicMaterial color="#8d93c4" />
+        </mesh>
+      ))}
+      <mesh geometry={wireA}>
+        <meshBasicMaterial color="#565b8c" transparent opacity={0.55} />
+      </mesh>
+      <mesh geometry={wireB}>
+        <meshBasicMaterial color="#565b8c" transparent opacity={0.45} />
+      </mesh>
+    </>
+  );
+}
+
+function Tower3G({ top }: { top: number }) {
+  const h = top - FLOOR;
+  const legs = [-1, 1];
+  return (
+    <>
+      {/* решётчатая ферма: две наклонные ноги + распорки, панели веером, тарелка */}
+      {legs.map((sgn) => (
+        <mesh
+          key={sgn}
+          position={[sgn * 0.11, (top + FLOOR) / 2, 0]}
+          rotation-z={sgn * -0.075}
+        >
+          <cylinderGeometry args={[0.035, 0.05, h, 8]} />
+          <meshStandardMaterial color={STEEL} metalness={0.55} roughness={0.4} />
+        </mesh>
+      ))}
+      {[0.22, 0.45, 0.68].map((f, bi) => (
+        <mesh
+          key={f}
+          position={[0, FLOOR + h * f, 0]}
+          rotation-z={bi % 2 ? 0.5 : -0.5}
+        >
+          <boxGeometry args={[0.34, 0.035, 0.035]} />
+          <meshStandardMaterial color={STEEL} metalness={0.55} roughness={0.4} />
+        </mesh>
+      ))}
+      <mesh position={[0, top, 0]}>
+        <boxGeometry args={[0.6, 0.09, 0.44]} />
+        <meshStandardMaterial color={STEEL_L} metalness={0.5} roughness={0.35} />
+      </mesh>
+      {[-0.45, 0, 0.45].map((ry) => (
+        <mesh key={ry} position={[Math.sin(ry) * 0.16, top - 0.26, Math.cos(ry) * 0.1]} rotation-y={ry}>
+          <boxGeometry args={[0.09, 0.3, 0.03]} />
+          <meshStandardMaterial color="#4a4694" metalness={0.4} roughness={0.4} />
+        </mesh>
+      ))}
+      {/* спутниковая тарелка смотрит вбок */}
+      <mesh position={[-0.22, top - 0.62, 0.05]} rotation-z={1.15} rotation-y={0.35}>
+        <coneGeometry args={[0.17, 0.07, 18, 1, true]} />
+        <meshStandardMaterial color="#8d93c4" metalness={0.5} roughness={0.3} side={THREE.DoubleSide} />
+      </mesh>
+    </>
+  );
+}
+
+function TowerLTE({ top }: { top: number }) {
+  return (
+    <>
+      {/* городская БС: ровная мачта, кольцо секторных панелей, СВЧ-барабаны */}
+      <mesh position={[0, (top + FLOOR) / 2, 0]}>
+        <cylinderGeometry args={[0.05, 0.07, top - FLOOR, 10]} />
+        <meshStandardMaterial color={STEEL} metalness={0.55} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, top, 0]}>
+        <boxGeometry args={[0.62, 0.09, 0.46]} />
+        <meshStandardMaterial color={STEEL_L} metalness={0.5} roughness={0.35} />
+      </mesh>
+      {[0, 1, 2, 3, 4, 5].map((i) => {
+        const a = (i / 6) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[Math.sin(a) * 0.17, top - 0.3, Math.cos(a) * 0.17]} rotation-y={a}>
+            <boxGeometry args={[0.1, 0.4, 0.03]} />
+            <meshStandardMaterial color={PLASTIC} metalness={0.4} roughness={0.4} />
+          </mesh>
+        );
+      })}
+      {[-1, 1].map((sgn) => (
+        <mesh key={sgn} position={[sgn * 0.14, top - 0.72, 0]} rotation-z={Math.PI / 2}>
+          <cylinderGeometry args={[0.075, 0.075, 0.09, 12]} />
+          <meshStandardMaterial color="#8d93c4" metalness={0.5} roughness={0.35} />
+        </mesh>
+      ))}
+    </>
+  );
+}
+
+function Tower5G({ top }: { top: number }) {
+  const arrGeo = useMemo(() => new RoundedBoxGeometry(0.3, 0.52, 0.22, 3, 0.06), []);
+  const cellGeo = useMemo(() => new RoundedBoxGeometry(0.13, 0.18, 0.11, 2, 0.035), []);
+  return (
+    <>
+      {/* смолл-селл: гладкий светлый столб, скруглённый массив, коробочки сот */}
+      <mesh position={[0, (top + FLOOR) / 2, 0]}>
+        <cylinderGeometry args={[0.042, 0.055, top - FLOOR, 12]} />
+        <meshStandardMaterial color={PLASTIC} metalness={0.35} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, top - 0.32, 0]} geometry={arrGeo}>
+        <meshStandardMaterial color="#565390" metalness={0.35} roughness={0.3} />
+      </mesh>
+      <mesh position={[0, top, 0]}>
+        <boxGeometry args={[0.58, 0.09, 0.42]} />
+        <meshStandardMaterial color="#565390" metalness={0.4} roughness={0.3} />
+      </mesh>
+      {[-0.85, -1.35].map((dy, i) => (
+        <mesh key={dy} position={[i % 2 ? -0.09 : 0.09, top + dy, 0]} geometry={cellGeo}>
+          <meshStandardMaterial color={PLASTIC} metalness={0.35} roughness={0.35} />
+        </mesh>
+      ))}
+    </>
+  );
+}
+
+function Tower6G({ top, ring }: { top: number; ring: React.RefObject<THREE.Mesh | null> }) {
+  return (
+    <>
+      {/* шпиль будущего: игла, левитирующее неон-кольцо, самая высокая точка */}
+      <mesh position={[0, (top + FLOOR) / 2, 0]}>
+        <cylinderGeometry args={[0.02, 0.06, top - FLOOR, 10]} />
+        <meshStandardMaterial color="#8d93c4" metalness={0.7} roughness={0.25} />
+      </mesh>
+      <mesh position={[0, top, 0]}>
+        <boxGeometry args={[0.56, 0.08, 0.4]} />
+        <meshStandardMaterial color="#8d93c4" metalness={0.6} roughness={0.25} />
+      </mesh>
+      <mesh ref={ring} position={[0, top - 0.55, 0]} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[0.3, 0.024, 8, 36]} />
+        <meshBasicMaterial color={NU_NEON} transparent opacity={0.85} depthWrite={false} />
+      </mesh>
+    </>
+  );
+}
+
 function World() {
   const world = useRef<THREE.Group>(null!);
   const starsA = useRef<THREE.Points>(null!);
@@ -75,8 +263,8 @@ function World() {
   const antDot = useRef<THREE.Mesh>(null!);
   const antRings = useRef<(THREE.Mesh | null)[]>([]);
   const lights = useRef<(THREE.Mesh | null)[]>([]);
-  const masts = useRef<(THREE.Mesh | null)[]>([]);
-  const pads = useRef<(THREE.Mesh | null)[]>([]);
+  const towersG = useRef<(THREE.Group | null)[]>([]);
+  const ring6 = useRef<THREE.Mesh>(null);
   const { gl } = useThree();
 
   const bodyGeo = useMemo(() => makePrismaBody(NU_STOPS), []);
@@ -91,7 +279,7 @@ function World() {
     happy: 0,
     spin: 0,
     spinCur: 0,
-    flash: [0, 0, 0, 0],
+    flash: [0, 0, 0, 0, 0],
     lvl: 0,
     mouse: { x: 0, y: 0 },
     d: 0,
@@ -137,14 +325,16 @@ function World() {
     (starsB.current.material as THREE.PointsMaterial).opacity =
       0.35 + 0.3 * Math.sin(t * 1.6 + Math.PI);
 
-    // вышки держат строй по текущей ширине вьюпорта
-    masts.current.forEach((m, mi) => {
-      if (m) m.position.x = xs[mi];
+    // вышки держат строй по ширине; кольцо 6G левитирует и вращается
+    towersG.current.forEach((tw, ti) => {
+      if (tw) tw.position.x = xs[ti];
     });
-    pads.current.forEach((pd, pi) => {
-      if (pd) pd.position.x = xs[pi];
-    });
-    // огоньки вышек: пульс + вспышка при приземлении
+    if (ring6.current) {
+      ring6.current.rotation.z += d * 1.1;
+      ring6.current.position.y = TOPS[4] - 0.55 + Math.sin(t * 1.4) * 0.07;
+    }
+
+    // маячки: пульс, вспышка при приземлении; включаются по мере прогресса
     lights.current.forEach((l, li) => {
       if (!l) return;
       s.flash[li] = Math.max(0, s.flash[li] - d * 2.2);
@@ -152,46 +342,42 @@ function World() {
       const m = l.material as THREE.MeshBasicMaterial;
       m.color.lerpColors(
         new THREE.Color("#5c2447"),
-        new THREE.Color(li === 3 ? "#ffffff" : NU_NEON),
+        new THREE.Color(li === 4 ? "#ffffff" : NU_NEON),
         Math.min(1, on + s.flash[li])
       );
-      const ls = 1 + 0.15 * Math.sin(t * 3 + li) + s.flash[li] * 0.9;
-      l.scale.setScalar(ls);
-      // маячок сидит на краю площадки, чтобы не втыкаться в приземлившегося
-      l.position.x = xs[li] + 0.34;
+      l.scale.setScalar(1 + 0.15 * Math.sin(t * 3 + li) + s.flash[li] * 0.9);
     });
 
-    // машина прыжков: rest → jump к следующей вышке; с 6G — сальто назад к 3G
+    // машина прыжков: rest → jump к следующей эпохе; с 6G — сальто назад к 2G
     const el = t - s.t0;
     let px = xs[s.i];
     let py = TOPS[s.i];
     let arc = 0;
-    let p = 0;
     let flare = 0;
     if (s.phase === "rest" && el > REST) {
       s.t0 = t;
-      s.phase = s.i === 3 ? "back" : "jump";
+      s.phase = s.i === 4 ? "back" : "jump";
       if (s.phase === "back") s.spin += Math.PI * 2;
     } else if (s.phase === "jump") {
-      p = Math.min(1, el / JUMP);
+      const p = Math.min(1, el / JUMP);
       const j = s.i + 1;
       px = lerp(xs[s.i], xs[j], p);
       py = lerp(TOPS[s.i], TOPS[j], p);
-      arc = Math.sin(Math.PI * p) * 1.5;
+      arc = Math.sin(Math.PI * p) * 1.45;
       flare = Math.sin(Math.PI * Math.min(1, p * 1.4));
       if (p >= 1) {
         s.i = j;
         s.lvl = j;
         s.flash[j] = 1;
-        if (j === 3) s.happy = 1.2;
+        if (j === 4) s.happy = 1.2;
         s.phase = "rest";
         s.t0 = t;
       }
     } else if (s.phase === "back") {
-      p = Math.min(1, el / BACK);
-      px = lerp(xs[3], xs[0], p);
-      py = lerp(TOPS[3], TOPS[0], p);
-      arc = Math.sin(Math.PI * p) * 2.7;
+      const p = Math.min(1, el / BACK);
+      px = lerp(xs[4], xs[0], p);
+      py = lerp(TOPS[4], TOPS[0], p);
+      arc = Math.sin(Math.PI * p) * 2.9;
       flare = Math.sin(Math.PI * p);
       if (p >= 1) {
         s.i = 0;
@@ -215,7 +401,8 @@ function World() {
     g.position.set(px, py + 0.06 + 1.45 * BODY_S + arc + idleBob, 0);
 
     // сквош-стретч: вытяжка в полёте, приседание на приземлении
-    const impact = s.phase === "rest" && el < 0.16 ? 1 - el / 0.16 : 0;
+    const elNow = t - s.t0;
+    const impact = s.phase === "rest" && elNow < 0.16 ? 1 - elNow / 0.16 : 0;
     const sy = 1 + flare * 0.14 - impact * 0.16;
     const sx = 1 - flare * 0.07 + impact * 0.1;
     bodyG.current.scale.set(BODY_S * sx, BODY_S * sy, BODY_S * sx);
@@ -236,7 +423,8 @@ function World() {
       e.scale.x = lerp(e.scale.x, happyNow ? 1.15 : 1, kf);
     });
 
-    // неон: след-луч, ореол и антенна — пульс как у гида, вспышки в полёте
+    // неон: след-луч, ореол и антенна — пульс как у гида, вспышки в полёте.
+    // антенна читает эпоху: на 2G огонёк тусклый, кольца появляются с LTE
     const pulse = 0.5 + 0.5 * Math.sin(t * 6);
     const flick = 0.88 + 0.12 * Math.sin(t * 23.7);
     if (trail.current) {
@@ -250,23 +438,27 @@ function World() {
         (0.14 + 0.4 * pulse) * flick + flare * 0.3;
     }
     if (antDot.current) {
-      antDot.current.scale.setScalar(1 + 0.14 * Math.sin(t * 3.2) + flare * 0.3);
-      (antDot.current.material as THREE.MeshBasicMaterial).color.lerpColors(
-        new THREE.Color(NU_NEON),
-        new THREE.Color("#ffffff"),
-        s.lvl / 3
+      const dim = s.lvl === 0 ? 0.72 : 1;
+      antDot.current.scale.setScalar(
+        (1 + 0.14 * Math.sin(t * 3.2) + flare * 0.3) * dim
       );
+      const m = antDot.current.material as THREE.MeshBasicMaterial;
+      if (s.lvl === 0) m.color.set("#a63d76");
+      else
+        m.color.lerpColors(
+          new THREE.Color(NU_NEON),
+          new THREE.Color("#ffffff"),
+          (s.lvl - 1) / 3
+        );
     }
     antRings.current.forEach((ring, ri) => {
       if (!ring) return;
-      const target = s.lvl > ri ? 1 : 0;
+      const target = s.lvl - 1 > ri ? 1 : 0;
       const ns = lerp(ring.scale.x, target, 1 - Math.pow(0.002, d));
       ring.scale.setScalar(Math.max(0.001, ns));
       (ring.material as THREE.MeshBasicMaterial).opacity = (0.75 - ri * 0.16) * ns;
     });
   });
-
-  const towers = XS.map((fr, i) => ({ top: TOPS[i], i }));
 
   return (
     <>
@@ -284,29 +476,21 @@ function World() {
           <meshBasicMaterial color="#3a2a55" />
         </mesh>
 
-        {towers.map(({ top, i }) => (
-          <group key={i}>
-            {/* мачта и площадка — тёмная сталь мира игры; x расставляет useFrame */}
+        {TOPS.map((top, i) => (
+          <group
+            key={i}
+            ref={(el) => {
+              towersG.current[i] = el;
+            }}
+          >
+            {i === 0 && <Pole2G top={top} />}
+            {i === 1 && <Tower3G top={top} />}
+            {i === 2 && <TowerLTE top={top} />}
+            {i === 3 && <Tower5G top={top} />}
+            {i === 4 && <Tower6G top={top} ring={ring6} />}
+            {/* маячок на краю площадки: пульс эпохи и вспышка приземления */}
             <mesh
-              position={[0, (top + FLOOR) / 2, 0]}
-              ref={(el) => {
-                masts.current[i] = el;
-              }}
-            >
-              <cylinderGeometry args={[0.05, 0.075, top - FLOOR, 10]} />
-              <meshStandardMaterial color="#211d4d" metalness={0.55} roughness={0.4} />
-            </mesh>
-            <mesh
-              position={[0, top, 0]}
-              ref={(el) => {
-                pads.current[i] = el;
-              }}
-            >
-              <boxGeometry args={[0.66, 0.09, 0.48]} />
-              <meshStandardMaterial color="#2c2761" metalness={0.5} roughness={0.35} />
-            </mesh>
-            <mesh
-              position={[0, top + 0.13, 0]}
+              position={[0.34, top + 0.13, 0]}
               ref={(el) => {
                 lights.current[i] = el;
               }}

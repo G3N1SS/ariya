@@ -11,6 +11,9 @@ export type CaseStripT = {
   eras: readonly string[];
 };
 
+// держать в синхроне с XS из three/StripScene (не импортим — там three-чанк)
+const ERA_XS = [-0.38, -0.19, 0, 0.19, 0.38];
+
 // идеи №3+№4 с доски: полноширинная 3D-лента мира игры, внутри которой
 // Призма-геймер прыгает по вышкам эпох; параллакс на скролл, наклон за мышью
 export default function CaseStrip({ t }: { t: CaseStripT }) {
@@ -42,8 +45,11 @@ export default function CaseStrip({ t }: { t: CaseStripT }) {
       <span className="cs-hint">{t.hint}</span>
       <div className="cs-canvas">{live && <Strip3D />}</div>
       <div className="cs-labels">
-        {t.eras.map((e) => (
-          <i key={e}>{e}</i>
+        {t.eras.map((e, i) => (
+          // фракции ширины — синхронно с XS в StripScene: лейбл под вышкой
+          <i key={e} style={{ left: `${(0.5 + ERA_XS[i]) * 100}%` }}>
+            {e}
+          </i>
         ))}
       </div>
     </section>

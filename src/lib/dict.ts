@@ -288,9 +288,9 @@ export const dict = {
       ctaH: "Want a product people actually play?",
       ctaBtn: "discuss on Telegram",
       strip: {
-        cap: "// the game world: towers from 3G to 6G",
+        cap: "// the game world: from a 2G pole to the 6G spire",
         hint: "scroll tilts it \u00b7 cursor sways it \u00b7 click the jumper",
-        eras: ["3G", "LTE", "5G", "6G"],
+        eras: ["2G", "3G", "LTE", "5G", "6G"],
       },
       guide: {
         greet: "hi! wearing my Novy Uroven skin today \u2014 let's fly through the case",
@@ -616,9 +616,9 @@ export const dict = {
       ctaH: "Хотите продукт, в который играют?",
       ctaBtn: "обсудить в Telegram",
       strip: {
-        cap: "// мир игры: вышки от 3G до 6G",
+        cap: "// мир игры: от столба 2G до шпиля 6G",
         hint: "скролл наклоняет · курсор качает · джампер кликается",
-        eras: ["3G", "LTE", "5G", "6G"],
+        eras: ["2G", "3G", "LTE", "5G", "6G"],
       },
       guide: {
         greet: "привет! я сегодня в скине «нового уровня» — полетели по кейсу",

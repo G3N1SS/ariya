@@ -659,12 +659,12 @@ html[lang="ru"] .hero h1 {
   left: 0;
   right: 0;
   bottom: 8px;
-  display: flex;
-  justify-content: center;
-  gap: clamp(52px, 17vw, 210px);
+  height: 16px;
   pointer-events: none;
 }
 .cs-labels i {
+  position: absolute;
+  transform: translateX(-50%);
   font-style: normal;
   font-family: var(--font-mono);
   font-size: 11px;
