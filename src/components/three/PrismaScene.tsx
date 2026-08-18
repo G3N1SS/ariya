@@ -82,6 +82,8 @@ function Mascot({ mode }: { mode: Mode }) {
   const flameL = useRef<THREE.Mesh>(null);
   const flameR = useRef<THREE.Mesh>(null);
   const trail = useRef<THREE.Mesh>(null);
+  const glow = useRef<THREE.Mesh>(null);
+  const nuMat = useRef<THREE.MeshPhysicalMaterial>(null);
   const antDot = useRef<THREE.Mesh>(null);
   const antRings = useRef<(THREE.Mesh | null)[]>([]);
   const antLevel = useRef(0);
@@ -131,6 +133,20 @@ function Mascot({ mode }: { mode: Mode }) {
   const geo = useMemo(() => makeBody(GRAD_STOPS), []);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const geoNu = useMemo(() => makeBody(NU_STOPS), []);
+  // неон-ореол игрока из игры: мягкий radial-глоу мадженты за телом
+  const glowTex = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const ctx = c.getContext("2d")!;
+    const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 126);
+    grad.addColorStop(0, "rgba(255,52,149,0.5)");
+    grad.addColorStop(0.45, "rgba(255,52,149,0.2)");
+    grad.addColorStop(1, "rgba(255,52,149,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }, []);
+
   // корпус джетпака — скруглённый ранец на спине, скошен как тело
   const jetGeo = useMemo(() => {
     const g = new RoundedBoxGeometry(0.58, 0.78, 0.26, 4, 0.09);
@@ -401,6 +417,18 @@ function Mascot({ mode }: { mode: Mode }) {
 
     // ── скин «нового уровня»: живой джетпак и антенна эпох ──
     if (skinRef.current === "nu") {
+      // неон мигает как в игре: ореол — формула ауры (sin·6), тело дышит светом
+      if (glow.current) {
+        const pulse = 0.5 + 0.5 * Math.sin(t * 6);
+        (glow.current.material as THREE.MeshBasicMaterial).opacity =
+          0.3 + 0.24 * pulse + flare * 0.3;
+        const gs = 1 + pulse * 0.05 + flare * 0.12;
+        glow.current.scale.set(gs, gs, 1);
+      }
+      if (nuMat.current) {
+        nuMat.current.emissiveIntensity =
+          0.28 + 0.22 * (0.5 + 0.5 * Math.sin(t * 6)) + flare * 0.5;
+      }
       // пламя мерцает в покое и раздувается в прыжке
       [flameL.current, flameR.current].forEach((fl, fi) => {
         if (!fl) return;
@@ -473,6 +501,7 @@ function Mascot({ mode }: { mode: Mode }) {
           ) : skin === "nu" ? (
             <meshPhysicalMaterial
               key="skin-nu"
+              ref={nuMat}
               vertexColors
               roughness={0.3}
               metalness={0}
@@ -518,6 +547,16 @@ function Mascot({ mode }: { mode: Mode }) {
         {/* экипировка «нового уровня»: космо-джетпак и антенна эпох из игры */}
         {skin === "nu" && (
           <group>
+            {/* пульс-ореол «сигнала» — мигает с частотой аур из игры */}
+            <mesh ref={glow} position={[0, 0, -0.65]} rotation-z={-0.2}>
+              <planeGeometry args={[3.6, 4.8]} />
+              <meshBasicMaterial
+                map={glowTex}
+                transparent
+                opacity={0.45}
+                depthWrite={false}
+              />
+            </mesh>
             <group position={[0, 0.02, -0.47]}>
               <mesh geometry={jetGeo}>
                 <meshStandardMaterial color="#191536" metalness={0.5} roughness={0.38} />
