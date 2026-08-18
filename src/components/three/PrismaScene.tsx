@@ -417,17 +417,19 @@ function Mascot({ mode }: { mode: Mode }) {
 
     // ── скин «нового уровня»: живой джетпак и антенна эпох ──
     if (skinRef.current === "nu") {
-      // неон мигает как в игре: ореол — формула ауры (sin·6), тело дышит светом
+      // неон мигает как в игре и В ПОКОЕ: медленный пульс ауры (sin·6) ×
+      // быстрое дрожание неоновой трубки — амплитуда широкая, видно всегда
+      const pulse = 0.5 + 0.5 * Math.sin(t * 6);
+      const flick = 0.88 + 0.12 * Math.sin(t * 23.7);
       if (glow.current) {
-        const pulse = 0.5 + 0.5 * Math.sin(t * 6);
         (glow.current.material as THREE.MeshBasicMaterial).opacity =
-          0.3 + 0.24 * pulse + flare * 0.3;
-        const gs = 1 + pulse * 0.05 + flare * 0.12;
+          (0.16 + 0.44 * pulse) * flick + flare * 0.3;
+        const gs = 1 + pulse * 0.07 + flare * 0.12;
         glow.current.scale.set(gs, gs, 1);
       }
       if (nuMat.current) {
         nuMat.current.emissiveIntensity =
-          0.28 + 0.22 * (0.5 + 0.5 * Math.sin(t * 6)) + flare * 0.5;
+          (0.16 + 0.4 * pulse) * flick + flare * 0.5;
       }
       // пламя мерцает в покое и раздувается в прыжке
       [flameL.current, flameR.current].forEach((fl, fi) => {
