@@ -54,8 +54,23 @@ const ENTER: Pose = { x: 0, y: 0, z: 1.1, rx: 0, ry: 0, rz: 0, spread: 1, s: 0.7
 const SECTION_IDS = ["services", "work", "why", "process", "contact"];
 
 // тексты, через которые пролетает лого: при пересечении инвертируем задетое
-const INV_SELECTOR =
-  ".s-head h2, .s-head .idx, .intro, .why-lead, .svc-plus, .case-closing, .cta-title, .cta-sub";
+const INV_SELECTOR = [
+  ".s-head h2",
+  ".s-head .idx",
+  ".intro",
+  ".why-lead",
+  ".why-item b",
+  ".why-item p",
+  ".step .n",
+  ".step h3",
+  ".step p",
+  ".svc-plus",
+  ".case-closing",
+  ".case-empty b",
+  ".case-empty span",
+  ".cta-title",
+  ".cta-sub",
+].join(", ");
 // свойства, которые клон копирует, чтобы лечь пиксель-в-пиксель на оригинал
 const INV_STYLE_PROPS = [
   "fontFamily",
