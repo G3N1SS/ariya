@@ -1,5 +1,6 @@
 import { dict, contacts, type Locale } from "@/lib/dict";
 import CaseGuide from "./CaseGuide";
+import CaseStrip from "./CaseStrip";
 
 // Страница кейса «Новый уровень»: общая для обеих локалей, тексты из dict
 export default function CaseNovy({ locale }: { locale: Locale }) {
@@ -63,6 +64,8 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
           ))}
         </div>
       </section>
+
+      <CaseStrip t={t.strip} />
 
       <section className="cp-sec" data-cg="eras">
         <h2>{t.erasH}</h2>

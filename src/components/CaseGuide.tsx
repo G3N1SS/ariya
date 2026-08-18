@@ -154,13 +154,40 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     };
     cta?.addEventListener("click", onCta);
 
+    // клик «поиграть» в шапке — сальто большого Призмы (идея №3 с доски)
+    const play = document.querySelector<HTMLElement>(".cpage > .btn-primary");
+    const onPlay = () =>
+      window.dispatchEvent(new CustomEvent("ariya:emotion", { detail: "spin" }));
+    play?.addEventListener("click", onPlay);
+
+    // пока лента-диорама на экране, угловой гид прячется: Призма «в сцене»
+    let stripIo: IntersectionObserver | undefined;
+    const strip = document.querySelector(".case-strip");
+    if (strip) {
+      stripIo = new IntersectionObserver(
+        (en) => {
+          const on = en.some((e) => e.isIntersecting);
+          const w = wrap.current;
+          if (w) {
+            w.style.opacity = on ? "0" : "1";
+            w.style.transition = "opacity 0.4s";
+          }
+          if (on) setBubble(null);
+        },
+        { threshold: 0.25 }
+      );
+      stripIo.observe(strip);
+    }
+
     return () => {
       window.removeEventListener("scroll", place);
       window.removeEventListener("resize", measure);
       window.removeEventListener("load", measure);
       window.clearTimeout(timer.current);
       io.disconnect();
+      stripIo?.disconnect();
       cta?.removeEventListener("click", onCta);
+      play?.removeEventListener("click", onPlay);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);

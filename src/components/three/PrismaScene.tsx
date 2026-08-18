@@ -6,7 +6,7 @@ import { RoundedBoxGeometry } from "three-stdlib";
 import * as THREE from "three";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const SHEAR = Math.tan((22 * Math.PI) / 180);
+export const SHEAR = Math.tan((22 * Math.PI) / 180);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 type Emotion = "idle" | "happy" | "surprised" | "wink" | "jump";
@@ -22,10 +22,10 @@ const EMO_TTL: Record<Emotion, number> = {
 
 // лицо сидит на наклонной грани: на высоте y центр тела смещён шером;
 // плюс сдвиг по ходу наклона — взгляд «туда, куда показывает слэш» (как в эскизе)
-const EYE_Y = 0.55;
-const FACE_X = SHEAR * EYE_Y + 0.09;
-const EYE_GAP = 0.17;
-const EYE_Z = 0.415;
+export const EYE_Y = 0.55;
+export const FACE_X = SHEAR * EYE_Y + 0.09;
+export const EYE_GAP = 0.17;
+export const EYE_Z = 0.415;
 
 function useShadowTexture() {
   return useMemo(() => {
@@ -49,12 +49,12 @@ const GRAD_STOPS: [number, THREE.Color][] = [
 ];
 
 // скин кейса «Новый уровень»: палитра игры — неон-магента игрока на чёрном небе
-const NU_STOPS: [number, THREE.Color][] = [
+export const NU_STOPS: [number, THREE.Color][] = [
   [0, new THREE.Color("#FF8CC0")],
   [0.5, new THREE.Color("#F0187E")],
   [1, new THREE.Color("#7C0D49")],
 ];
-const NU_NEON = "#FF2E92";
+export const NU_NEON = "#FF2E92";
 
 function ramp(stops: [number, THREE.Color][], t: number, out: THREE.Color) {
   for (let i = 1; i < stops.length; i++) {
@@ -66,6 +66,34 @@ function ramp(stops: [number, THREE.Color][], t: number, out: THREE.Color) {
     }
   }
   return out.copy(stops[0][1]);
+}
+
+// тело Призмы — фирменный слэш; сегментов много, чтобы фаски были гладкими.
+// вершинный градиент — непрерывный по всему телу, без швов на гранях;
+// светлая зона накрывает верхнюю половину, глубокая — только низ.
+// у скинов свои палитры — геометрия печётся под каждую; экспорт нужен
+// сценам кейсов (лента-диорама собирает своего Призму из этих же деталей)
+export function makePrismaBody(stops: [number, THREE.Color][]) {
+  const g = new RoundedBoxGeometry(1.15, 2.9, 0.8, 10, 0.34);
+  const m = new THREE.Matrix4();
+  m.set(1, SHEAR, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+  g.applyMatrix4(m);
+  g.computeVertexNormals();
+  const dir = new THREE.Vector3(0.42, -0.88, 0.18).normalize();
+  const pos = g.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  const v = new THREE.Vector3();
+  const c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const t = THREE.MathUtils.clamp(v.dot(dir) / 2.7 + 0.42, 0, 1);
+    ramp(stops, t, c);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+  }
+  g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  return g;
 }
 
 type Mode = "lab" | "lost" | "guide";
@@ -103,36 +131,8 @@ function Mascot({ mode, skin0 }: { mode: Mode; skin0?: Skin }) {
     clicks: 0,
   });
 
-  // тело Призмы — фирменный слэш; сегментов много, чтобы фаски были гладкими.
-  // вершинный градиент — непрерывный по всему телу, без швов на гранях;
-  // светлая зона накрывает верхнюю половину, глубокая — только низ.
-  // у скинов свои палитры — геометрия печётся под каждую и выбирается по скину
-  const makeBody = (stops: [number, THREE.Color][]) => {
-    const g = new RoundedBoxGeometry(1.15, 2.9, 0.8, 10, 0.34);
-    const m = new THREE.Matrix4();
-    m.set(1, SHEAR, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    g.applyMatrix4(m);
-    g.computeVertexNormals();
-    const dir = new THREE.Vector3(0.42, -0.88, 0.18).normalize();
-    const pos = g.attributes.position;
-    const colors = new Float32Array(pos.count * 3);
-    const v = new THREE.Vector3();
-    const c = new THREE.Color();
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      const t = THREE.MathUtils.clamp(v.dot(dir) / 2.7 + 0.42, 0, 1);
-      ramp(stops, t, c);
-      colors[i * 3] = c.r;
-      colors[i * 3 + 1] = c.g;
-      colors[i * 3 + 2] = c.b;
-    }
-    g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-    return g;
-  };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const geo = useMemo(() => makeBody(GRAD_STOPS), []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const geoNu = useMemo(() => makeBody(NU_STOPS), []);
+  const geo = useMemo(() => makePrismaBody(GRAD_STOPS), []);
+  const geoNu = useMemo(() => makePrismaBody(NU_STOPS), []);
   // неон-ореол игрока из игры: мягкий radial-глоу мадженты за телом
   const glowTex = useMemo(() => {
     const c = document.createElement("canvas");

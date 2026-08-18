@@ -287,6 +287,11 @@ export const dict = {
       stack: ["React 18", "TypeScript strict", "Vite", "PixiJS 8 \u00b7 WebGL", "Zustand", "PWA \u00b7 Workbox", "IndexedDB", "Neon"],
       ctaH: "Want a product people actually play?",
       ctaBtn: "discuss on Telegram",
+      strip: {
+        cap: "// the game world: towers from 3G to 6G",
+        hint: "scroll tilts it \u00b7 cursor sways it \u00b7 click the jumper",
+        eras: ["3G", "LTE", "5G", "6G"],
+      },
       guide: {
         greet: "hi! wearing my Novy Uroven skin today \u2014 let's fly through the case",
         shots: "these are live captures from the game, not mockups",
@@ -610,6 +615,11 @@ export const dict = {
       stack: ["React 18", "TypeScript strict", "Vite", "PixiJS 8 \u00b7 WebGL", "Zustand", "PWA \u00b7 Workbox", "IndexedDB", "Neon"],
       ctaH: "Хотите продукт, в который играют?",
       ctaBtn: "обсудить в Telegram",
+      strip: {
+        cap: "// мир игры: вышки от 3G до 6G",
+        hint: "скролл наклоняет · курсор качает · джампер кликается",
+        eras: ["3G", "LTE", "5G", "6G"],
+      },
       guide: {
         greet: "привет! я сегодня в скине «нового уровня» — полетели по кейсу",
         shots: "это живые кадры из игры, не мокапы",
