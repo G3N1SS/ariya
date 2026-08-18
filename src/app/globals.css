@@ -1630,8 +1630,11 @@ html.has-3d .hero-visual svg {
   mix-blend-mode: difference;
   will-change: transform;
 }
-/* оригинал на время инверсии прозрачен: клон рисует те же глифы поверх */
-.inv-src {
+/* оригинал на время инверсии прозрачен ВМЕСТЕ С ПОТОМКАМИ: у вложенных
+   спанов (.l2 и т.п.) свой color, простого transparent на корне мало —
+   иначе клон бленлится об их глифы и красит строку в фиолетовый */
+.inv-src,
+.inv-src * {
   color: transparent !important;
 }
 
