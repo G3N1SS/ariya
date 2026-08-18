@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTheme, toggleTheme, type Theme } from "@/lib/theme";
+import {
+  followSystemTheme,
+  getTheme,
+  toggleTheme,
+  type Theme,
+} from "@/lib/theme";
 
 // Тумблер темы: половинка круга — светлая/тёмная. Иконка, не эмодзи.
 export default function ThemeToggle({ label }: { label: string }) {
@@ -12,7 +17,12 @@ export default function ThemeToggle({ label }: { label: string }) {
     const onTheme = (e: Event) =>
       setThemeState((e as CustomEvent).detail as Theme);
     window.addEventListener("ariya:theme", onTheme);
-    return () => window.removeEventListener("ariya:theme", onTheme);
+    // без явного выбора тема дышит вместе с системной
+    const off = followSystemTheme();
+    return () => {
+      window.removeEventListener("ariya:theme", onTheme);
+      off();
+    };
   }, []);
 
   return (

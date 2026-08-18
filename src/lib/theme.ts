@@ -1,38 +1,64 @@
-// Тема сайта: светлая — фирменная по умолчанию, тёмная — «чернильная ночь».
-// Выбор живёт в localStorage, применяется до первой отрисовки инлайн-скриптом
-// в layout (см. THEME_BOOT), переключается с кроссфейдом через View Transitions.
+// Тема сайта: без сохранённого выбора следуем системной (prefers-color-scheme),
+// явный выбор тумблером сильнее системы и живёт в localStorage. Применяется до
+// первой отрисовки инлайн-скриптом THEME_BOOT, переключается с кроссфейдом.
 
 export type Theme = "light" | "dark";
 
 const KEY = "ariya-theme";
 const META: Record<Theme, string> = { light: "#ffffff", dark: "#090c22" };
 
-export const THEME_BOOT = `try{if(localStorage.getItem("${KEY}")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+// до гидрации: сохранённый выбор → он; иначе — системная тема
+export const THEME_BOOT = `try{var s=localStorage.getItem("${KEY}");var d=s?s==="dark":matchMedia("(prefers-color-scheme: dark)").matches;if(d)document.documentElement.dataset.theme="dark"}catch(e){}`;
 
 export function getTheme(): Theme {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
-export function setTheme(t: Theme) {
-  const apply = () => {
-    if (t === "dark") document.documentElement.dataset.theme = "dark";
-    else delete document.documentElement.dataset.theme;
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", META[t]);
-    window.dispatchEvent(new CustomEvent("ariya:theme", { detail: t }));
-  };
+export function hasExplicitChoice(): boolean {
   try {
-    localStorage.setItem(KEY, t);
-  } catch {}
-  // кроссфейд между темами — там, где браузер умеет
+    return localStorage.getItem(KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+function apply(t: Theme) {
+  if (t === "dark") document.documentElement.dataset.theme = "dark";
+  else delete document.documentElement.dataset.theme;
+  // theme-color объявлен парой media-тегов (auto) — явное применение
+  // перекрашивает оба, чтобы цвет шапки браузера совпал с выбором
+  document
+    .querySelectorAll('meta[name="theme-color"]')
+    .forEach((m) => m.setAttribute("content", META[t]));
+  window.dispatchEvent(new CustomEvent("ariya:theme", { detail: t }));
+}
+
+function withFade(cb: () => void) {
   const doc = document as Document & {
     startViewTransition?: (cb: () => void) => void;
   };
-  if (doc.startViewTransition) doc.startViewTransition(apply);
-  else apply();
+  if (doc.startViewTransition) doc.startViewTransition(cb);
+  else cb();
+}
+
+export function setTheme(t: Theme) {
+  try {
+    localStorage.setItem(KEY, t);
+  } catch {}
+  withFade(() => apply(t));
 }
 
 export function toggleTheme() {
   setTheme(getTheme() === "dark" ? "light" : "dark");
+}
+
+// пока человек не выбрал сам — темнеем и светлеем вместе с системой
+export function followSystemTheme(): () => void {
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  const onChange = () => {
+    if (hasExplicitChoice()) return;
+    withFade(() => apply(mq.matches ? "dark" : "light"));
+  };
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
 }

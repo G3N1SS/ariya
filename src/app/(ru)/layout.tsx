@@ -42,7 +42,12 @@ const jsonLd = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  // пара media-тегов: браузер красит свою шапку по системной теме ещё до JS;
+  // явный выбор темы перекрашивает оба тега скриптом (lib/theme.ts)
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#090c22" },
+  ],
 };
 
 export default function RootLayout({
