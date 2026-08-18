@@ -53,6 +53,25 @@ const ENTER: Pose = { x: 0, y: 0, z: 1.1, rx: 0, ry: 0, rz: 0, spread: 1, s: 0.7
 
 const SECTION_IDS = ["services", "work", "why", "process", "contact"];
 
+// тексты, через которые пролетает лого: при пересечении инвертируем задетое
+const INV_SELECTOR =
+  ".s-head h2, .s-head .idx, .intro, .why-lead, .svc-plus, .case-closing, .cta-title, .cta-sub";
+// свойства, которые клон копирует, чтобы лечь пиксель-в-пиксель на оригинал
+const INV_STYLE_PROPS = [
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "fontStyle",
+  "letterSpacing",
+  "lineHeight",
+  "textTransform",
+  "textAlign",
+  "whiteSpace",
+  "textWrap",
+  "wordSpacing",
+  "padding",
+] as const;
+
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 const smooth = (t: number) => t * t * (3 - 2 * t);
@@ -306,6 +325,12 @@ function Composition() {
     // якорь хиро-позы: центр и размер бокса статичного знака — на мобиле
     // лого встаёт ровно на его место и не наезжает на заголовок
     heroAnchor: null as { x: number; y: number; s: number } | null,
+    // инверсия задетых текстов: слой клонов над канвасом + активные пары
+    invLayer: null as HTMLDivElement | null,
+    invEls: [] as HTMLElement[],
+    invActive: new Map<HTMLElement, HTMLElement>(),
+    invBox: new THREE.Box3(),
+    invV: new THREE.Vector3(),
   });
 
   useEffect(() => {
@@ -408,6 +433,16 @@ function Composition() {
     window.addEventListener("resize", measure);
     window.addEventListener("ariya:loaded", onLoaded);
 
+    // слой инверсии: клоны задетых текстов живут над канвасом (root-контекст),
+    // поэтому difference-бленд видит и лого, и фон — в обход z-index у main
+    const layer = document.createElement("div");
+    layer.className = "inv-layer";
+    document.body.appendChild(layer);
+    s.invLayer = layer;
+    s.invEls = Array.from(
+      document.querySelectorAll<HTMLElement>(INV_SELECTOR)
+    );
+
     // сцена собрана — сообщаем прелоадеру и прячем статичный знак
     const raf = requestAnimationFrame(() => {
       document.documentElement.classList.add("has-3d");
@@ -422,6 +457,10 @@ function Composition() {
       window.removeEventListener("resize", measure);
       window.removeEventListener("ariya:loaded", onLoaded);
       document.documentElement.classList.remove("has-3d");
+      s.invActive.forEach((_, el) => el.classList.remove("inv-src"));
+      s.invActive.clear();
+      layer.remove();
+      s.invLayer = null;
     };
   }, []);
 
@@ -522,6 +561,57 @@ function Composition() {
       m.position.x = (bi - 1) * BAR.gap * pose.spread;
       m.position.y = Math.sin(t * 0.9 + bi * 2.1) * 0.05 * live;
     });
+
+    // ── инверсия задетого текста: экранный bbox лого против rect'ов текстов ──
+    if (s.entrance > 0.85 && s.invLayer) {
+      const box = s.invBox.setFromObject(g);
+      const v = s.invV;
+      let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+      for (let ci = 0; ci < 8; ci++) {
+        v.set(
+          ci & 1 ? box.max.x : box.min.x,
+          ci & 2 ? box.max.y : box.min.y,
+          ci & 4 ? box.max.z : box.min.z
+        ).project(cam);
+        const sx = ((v.x + 1) / 2) * window.innerWidth;
+        const sy = ((1 - v.y) / 2) * window.innerHeight;
+        if (sx < minX) minX = sx;
+        if (sx > maxX) maxX = sx;
+        if (sy < minY) minY = sy;
+        if (sy > maxY) maxY = sy;
+      }
+      const pad = 8;
+      for (const el of s.invEls) {
+        const r = el.getBoundingClientRect();
+        const hit =
+          r.width > 0 &&
+          r.left < maxX + pad && r.right > minX - pad &&
+          r.top < maxY + pad && r.bottom > minY - pad;
+        const clone = s.invActive.get(el);
+        if (hit && !clone) {
+          // накрываем оригинал клоном с difference: тот же текст, та же метрика
+          const c = document.createElement("div");
+          c.className =
+            "inv-clone" + (el.classList.contains("idx") ? " blue" : "");
+          const cs = getComputedStyle(el) as unknown as Record<string, string>;
+          const st2 = c.style as unknown as Record<string, string>;
+          for (const p of INV_STYLE_PROPS) st2[p] = cs[p];
+          c.textContent = el.textContent;
+          c.style.width = r.width + "px";
+          c.style.transform = `translate(${r.left}px, ${r.top}px)`;
+          s.invLayer.appendChild(c);
+          el.classList.add("inv-src");
+          s.invActive.set(el, c);
+        } else if (!hit && clone) {
+          clone.remove();
+          el.classList.remove("inv-src");
+          s.invActive.delete(el);
+        } else if (clone) {
+          clone.style.width = r.width + "px";
+          clone.style.transform = `translate(${r.left}px, ${r.top}px)`;
+        }
+      }
+    }
 
     // мягкая тень: в хиро и у строя в CTA; в футере (парковка в wordmark) её нет
     const ctaStop = stops[Math.max(0, stops.length - 2)];

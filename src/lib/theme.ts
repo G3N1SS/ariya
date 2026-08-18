@@ -35,10 +35,18 @@ function apply(t: Theme) {
 
 function withFade(cb: () => void) {
   const doc = document as Document & {
-    startViewTransition?: (cb: () => void) => void;
+    startViewTransition?: (cb: () => void) => {
+      finished?: Promise<void>;
+      ready?: Promise<void>;
+    };
   };
-  if (doc.startViewTransition) doc.startViewTransition(cb);
-  else cb();
+  if (doc.startViewTransition) {
+    // в скрытой вкладке переход абортится — DOM всё равно обновляется,
+    // а отклонённые промисы не должны шуметь в консоли
+    const vt = doc.startViewTransition(cb);
+    vt?.finished?.catch(() => {});
+    vt?.ready?.catch(() => {});
+  } else cb();
 }
 
 export function setTheme(t: Theme) {

@@ -1615,6 +1615,40 @@ html.has-3d .hero-visual svg {
   transition: opacity 0.4s ease;
 }
 
+/* ── инверсия текста под пролетающим лого ── */
+/* базовые цвета подобраны так, что difference от фона даёт РОВНО фирменные:
+   |#F2EFCC − #FFF| = #0D1033 (ink), |#F3A100 − #FFF| = #0C5EFF (blue) */
+:root {
+  --inv-ink: #f2efcc;
+  --inv-blue: #f3a100;
+}
+html[data-theme="dark"] {
+  --inv-ink: #f2f9ff;
+  --inv-blue: #3780ff;
+}
+.inv-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.inv-clone {
+  position: fixed;
+  left: 0;
+  top: 0;
+  margin: 0;
+  mix-blend-mode: difference;
+  color: var(--inv-ink);
+  will-change: transform;
+}
+.inv-clone.blue {
+  color: var(--inv-blue);
+}
+/* оригинал на время инверсии прозрачен: клон рисует те же глифы поверх */
+.inv-src {
+  color: transparent !important;
+}
+
 /* ── морф-переходы между страницами (RU ↔ EN, 404) ── */
 /* прогрессивно: работает в Chrome/Safari, остальные просто перезагружаются */
 @view-transition {
