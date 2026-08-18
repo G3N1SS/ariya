@@ -7,14 +7,18 @@ const PrismaScene = dynamic(() => import("./PrismaScene"), { ssr: false });
 
 type Mode = "lab" | "lost" | "guide";
 
-const EMOTIONS = ["idle", "happy", "surprised", "wink", "spin"] as const;
+const EMOTIONS = ["idle", "happy", "surprised", "wink", "spin", "jump"] as const;
 const SKINS = [
   { id: "candy", label: "градиент" },
   { id: "chrome", label: "хром" },
+  { id: "nu", label: "новый уровень" },
 ] as const;
+// антенна скина «нового уровня» — эпохи сетей из игры
+const ERAS = ["3g", "lte", "5g", "6g"] as const;
 
 export default function PrismaLab() {
   const [skin, setSkin] = useState<(typeof SKINS)[number]["id"]>("candy");
+  const [era, setEra] = useState(0);
   // ?mode=lost|guide — превью других ипостасей Призмы прямо в лаборатории
   const [mode, setMode] = useState<Mode>("lab");
   useEffect(() => {
@@ -27,6 +31,10 @@ export default function PrismaLab() {
   const fireSkin = (id: (typeof SKINS)[number]["id"]) => {
     setSkin(id);
     window.dispatchEvent(new CustomEvent("ariya:skin", { detail: id }));
+  };
+  const fireEra = (idx: number) => {
+    setEra(idx);
+    window.dispatchEvent(new CustomEvent("ariya:antenna", { detail: idx }));
   };
 
   return (
@@ -59,6 +67,21 @@ export default function PrismaLab() {
             </button>
           ))}
         </div>
+        {skin === "nu" && (
+          <div className="pl-row">
+            {ERAS.map((e, i) => (
+              <button
+                key={e}
+                type="button"
+                className={era === i ? "on" : undefined}
+                onClick={() => fireEra(i)}
+              >
+                {"// "}
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

@@ -9,14 +9,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 const SHEAR = Math.tan((22 * Math.PI) / 180);
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-type Emotion = "idle" | "happy" | "surprised" | "wink";
-type Skin = "candy" | "chrome";
+type Emotion = "idle" | "happy" | "surprised" | "wink" | "jump";
+type Skin = "candy" | "chrome" | "nu";
 
 const EMO_TTL: Record<Emotion, number> = {
   idle: Infinity,
   happy: 1.4,
   surprised: 1.1,
   wink: 0.55,
+  jump: 0.9,
 };
 
 // лицо сидит на наклонной грани: на высоте y центр тела смещён шером;
@@ -47,16 +48,24 @@ const GRAD_STOPS: [number, THREE.Color][] = [
   [1, new THREE.Color("#0B49CC")],
 ];
 
-function ramp(t: number, out: THREE.Color) {
-  for (let i = 1; i < GRAD_STOPS.length; i++) {
-    const [t1, c1] = GRAD_STOPS[i];
-    if (t <= t1 || i === GRAD_STOPS.length - 1) {
-      const [t0, c0] = GRAD_STOPS[i - 1];
+// скин кейса «Новый уровень»: палитра игры — неон-магента игрока на чёрном небе
+const NU_STOPS: [number, THREE.Color][] = [
+  [0, new THREE.Color("#FF8CC0")],
+  [0.5, new THREE.Color("#F0187E")],
+  [1, new THREE.Color("#7C0D49")],
+];
+const NU_NEON = "#FF2E92";
+
+function ramp(stops: [number, THREE.Color][], t: number, out: THREE.Color) {
+  for (let i = 1; i < stops.length; i++) {
+    const [t1, c1] = stops[i];
+    if (t <= t1 || i === stops.length - 1) {
+      const [t0, c0] = stops[i - 1];
       out.lerpColors(c0, c1, THREE.MathUtils.clamp((t - t0) / (t1 - t0), 0, 1));
       return out;
     }
   }
-  return out.copy(GRAD_STOPS[0][1]);
+  return out.copy(stops[0][1]);
 }
 
 type Mode = "lab" | "lost" | "guide";
@@ -68,6 +77,14 @@ function Mascot({ mode }: { mode: Mode }) {
   const eyeR = useRef<THREE.Mesh>(null!);
   const shadow = useRef<THREE.Mesh>(null!);
   const [skin, setSkin] = useState<Skin>("candy");
+  // рефы скина «нового уровня»: пламя джетпака, огонёк и кольца антенны
+  const skinRef = useRef<Skin>("candy");
+  const flameL = useRef<THREE.Mesh>(null);
+  const flameR = useRef<THREE.Mesh>(null);
+  const trail = useRef<THREE.Mesh>(null);
+  const antDot = useRef<THREE.Mesh>(null);
+  const antRings = useRef<(THREE.Mesh | null)[]>([]);
+  const antLevel = useRef(0);
   const { camera, gl } = useThree();
 
   const st = useRef({
@@ -84,15 +101,16 @@ function Mascot({ mode }: { mode: Mode }) {
     clicks: 0,
   });
 
-  // тело Призмы — фирменный слэш; сегментов много, чтобы фаски были гладкими
-  const geo = useMemo(() => {
+  // тело Призмы — фирменный слэш; сегментов много, чтобы фаски были гладкими.
+  // вершинный градиент — непрерывный по всему телу, без швов на гранях;
+  // светлая зона накрывает верхнюю половину, глубокая — только низ.
+  // у скинов свои палитры — геометрия печётся под каждую и выбирается по скину
+  const makeBody = (stops: [number, THREE.Color][]) => {
     const g = new RoundedBoxGeometry(1.15, 2.9, 0.8, 10, 0.34);
     const m = new THREE.Matrix4();
     m.set(1, SHEAR, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     g.applyMatrix4(m);
     g.computeVertexNormals();
-    // вершинный градиент — непрерывный по всему телу, без швов на гранях;
-    // светлая зона накрывает верхнюю половину, глубокая — только низ
     const dir = new THREE.Vector3(0.42, -0.88, 0.18).normalize();
     const pos = g.attributes.position;
     const colors = new Float32Array(pos.count * 3);
@@ -101,12 +119,25 @@ function Mascot({ mode }: { mode: Mode }) {
     for (let i = 0; i < pos.count; i++) {
       v.fromBufferAttribute(pos, i);
       const t = THREE.MathUtils.clamp(v.dot(dir) / 2.7 + 0.42, 0, 1);
-      ramp(t, c);
+      ramp(stops, t, c);
       colors[i * 3] = c.r;
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
     }
     g.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    return g;
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const geo = useMemo(() => makeBody(GRAD_STOPS), []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const geoNu = useMemo(() => makeBody(NU_STOPS), []);
+  // корпус джетпака — скруглённый ранец на спине, скошен как тело
+  const jetGeo = useMemo(() => {
+    const g = new RoundedBoxGeometry(0.58, 0.78, 0.26, 4, 0.09);
+    const m = new THREE.Matrix4();
+    m.set(1, SHEAR, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+    g.applyMatrix4(m);
+    g.computeVertexNormals();
     return g;
   }, []);
 
@@ -120,6 +151,11 @@ function Mascot({ mode }: { mode: Mode }) {
 
   const react = () => {
     const s = st.current;
+    // в скине игры клик — всегда прыжок «как в игре», с пламенем джетпака
+    if (skinRef.current === "nu") {
+      setEmotion("jump");
+      return;
+    }
     const turn = s.clicks++ % 3;
     if (turn === 0) setEmotion("happy");
     else if (turn === 1) s.spinTarget += Math.PI * 2;
@@ -165,7 +201,15 @@ function Mascot({ mode }: { mode: Mode }) {
     };
     const onSkin = (e: Event) => {
       const name = (e as CustomEvent).detail as Skin;
-      if (name === "candy" || name === "chrome") setSkin(name);
+      if (name === "candy" || name === "chrome" || name === "nu") {
+        skinRef.current = name;
+        setSkin(name);
+      }
+    };
+    // антенна скина «нового уровня» апгрейдится по эпохам: 0=3G … 3=6G
+    const onAntenna = (e: Event) => {
+      const lvl = Number((e as CustomEvent).detail);
+      if (lvl >= 0 && lvl <= 3) antLevel.current = lvl;
     };
 
     // гид живёт в канвасе без pointer-events (клики проходят на страницу) —
@@ -193,6 +237,7 @@ function Mascot({ mode }: { mode: Mode }) {
     window.addEventListener("click", onGuideClick);
     window.addEventListener("ariya:emotion", onEmotion);
     window.addEventListener("ariya:skin", onSkin);
+    window.addEventListener("ariya:antenna", onAntenna);
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerdown", onDown);
@@ -200,6 +245,7 @@ function Mascot({ mode }: { mode: Mode }) {
       window.removeEventListener("click", onGuideClick);
       window.removeEventListener("ariya:emotion", onEmotion);
       window.removeEventListener("ariya:skin", onSkin);
+      window.removeEventListener("ariya:antenna", onAntenna);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
@@ -234,9 +280,18 @@ function Mascot({ mode }: { mode: Mode }) {
 
     const g = group.current;
     const guide = mode === "guide";
+    // прыжок «как в игре»: параболический подлёт, пламя вспыхивает на разгоне
+    let jumpY = 0;
+    let flare = 0;
+    if (emo === "jump") {
+      const p = 1 - s.emo.ttl / EMO_TTL.jump;
+      jumpY = Math.sin(Math.PI * p) * 0.62;
+      flare = Math.sin(Math.PI * Math.min(1, p * 1.5));
+    }
     const floatY =
       Math.sin(t * 0.9) * (guide ? 0.09 : 0.14) +
-      (emo === "happy" ? s.impulse * 0.3 : 0);
+      (emo === "happy" ? s.impulse * 0.3 : 0) +
+      jumpY;
     g.position.y = lerp(g.position.y, floatY, k);
     g.position.z = lerp(
       g.position.z,
@@ -278,6 +333,10 @@ function Mascot({ mode }: { mode: Mode }) {
     } else if (emo === "surprised") {
       sy = breath + s.impulse * 0.07;
       sxz = 1 - s.impulse * 0.04;
+    } else if (emo === "jump") {
+      // стретч на взлёте, сквош к приземлению
+      sy = breath + flare * 0.09;
+      sxz = 1 - flare * 0.05;
     }
     // в гиде размер — жёсткая доля кадра: тело = половина высоты бокса,
     // какой бы ни была камера; кувырок с наклоном занимают максимум ~55% —
@@ -312,7 +371,7 @@ function Mascot({ mode }: { mode: Mode }) {
       syR = blink,
       sx = 1,
       eyeLift = 0;
-    if (emo === "happy") {
+    if (emo === "happy" || emo === "jump") {
       syL = syR = 0.26;
       sx = 1.15;
       eyeLift = 0.06;
@@ -339,6 +398,48 @@ function Mascot({ mode }: { mode: Mode }) {
       (shadow.current.material as THREE.MeshBasicMaterial).opacity =
         0.3 - floatY * 0.35;
     }
+
+    // ── скин «нового уровня»: живой джетпак и антенна эпох ──
+    if (skinRef.current === "nu") {
+      // пламя мерцает в покое и раздувается в прыжке
+      [flameL.current, flameR.current].forEach((fl, fi) => {
+        if (!fl) return;
+        const flick = 0.7 + 0.3 * Math.sin(t * 24 + fi * 2.4);
+        fl.scale.y = flick * (0.65 + flare * 1.7);
+        const w = 0.85 + flare * 0.45;
+        fl.scale.x = w;
+        fl.scale.z = w;
+        (fl.material as THREE.MeshBasicMaterial).opacity =
+          0.55 + 0.25 * flick + flare * 0.2;
+      });
+      // неоновый след под телом — луч игрока из игры: тлеет, в прыжке бьёт
+      if (trail.current) {
+        const tr = 0.5 + 0.5 * Math.sin(t * 18);
+        const w = 0.75 + flare * 0.5;
+        trail.current.scale.set(w, 0.55 + flare * 1.1 + tr * 0.07, w);
+        (trail.current.material as THREE.MeshBasicMaterial).opacity =
+          0.16 + tr * 0.07 + flare * 0.55;
+      }
+      // огонёк пульсирует и белеет к 6G, кольца сигнала растут по уровню
+      const lvl = antLevel.current;
+      if (antDot.current) {
+        const pulse = 1 + 0.14 * Math.sin(t * 3.2) + flare * 0.35;
+        antDot.current.scale.setScalar(pulse);
+        (antDot.current.material as THREE.MeshBasicMaterial).color.lerpColors(
+          new THREE.Color(NU_NEON),
+          new THREE.Color("#ffffff"),
+          lvl / 3
+        );
+      }
+      antRings.current.forEach((ring, ri) => {
+        if (!ring) return;
+        const target = lvl > ri ? 1 : 0;
+        const ns = lerp(ring.scale.x, target, 1 - Math.pow(0.002, d));
+        ring.scale.setScalar(Math.max(0.001, ns));
+        (ring.material as THREE.MeshBasicMaterial).opacity =
+          (0.75 - ri * 0.16) * ns;
+      });
+    }
   });
 
   return (
@@ -357,7 +458,7 @@ function Mascot({ mode }: { mode: Mode }) {
           if (mode !== "guide") document.body.style.cursor = "";
         }}
       >
-        <mesh geometry={geo}>
+        <mesh geometry={skin === "nu" ? geoNu : geo}>
           {/* key: скины требуют разных шейдеров — материал пересоздаём, не мутируем */}
           {skin === "candy" ? (
             <meshPhysicalMaterial
@@ -368,6 +469,18 @@ function Mascot({ mode }: { mode: Mode }) {
               clearcoat={0.65}
               clearcoatRoughness={0.28}
               envMapIntensity={0.75}
+            />
+          ) : skin === "nu" ? (
+            <meshPhysicalMaterial
+              key="skin-nu"
+              vertexColors
+              roughness={0.3}
+              metalness={0}
+              clearcoat={0.7}
+              clearcoatRoughness={0.25}
+              envMapIntensity={0.8}
+              emissive="#99105C"
+              emissiveIntensity={0.35}
             />
           ) : (
             <meshPhysicalMaterial
@@ -390,7 +503,7 @@ function Mascot({ mode }: { mode: Mode }) {
           >
             <capsuleGeometry args={[0.1, 0.12, 8, 16]} />
             {/* самосветящиеся, не зависят от света; на хроме — чернильные, для контраста */}
-            <meshBasicMaterial color={skin === "candy" ? "#ffffff" : "#0D1033"} />
+            <meshBasicMaterial color={skin === "chrome" ? "#0D1033" : "#ffffff"} />
           </mesh>
           <mesh
             ref={eyeR}
@@ -398,9 +511,65 @@ function Mascot({ mode }: { mode: Mode }) {
             scale={[1, 1, 0.35]}
           >
             <capsuleGeometry args={[0.1, 0.12, 8, 16]} />
-            <meshBasicMaterial color={skin === "candy" ? "#ffffff" : "#0D1033"} />
+            <meshBasicMaterial color={skin === "chrome" ? "#0D1033" : "#ffffff"} />
           </mesh>
         </group>
+
+        {/* экипировка «нового уровня»: космо-джетпак и антенна эпох из игры */}
+        {skin === "nu" && (
+          <group>
+            <group position={[0, 0.02, -0.47]}>
+              <mesh geometry={jetGeo}>
+                <meshStandardMaterial color="#191536" metalness={0.5} roughness={0.38} />
+              </mesh>
+              <mesh position={[-0.16, -0.48, 0]}>
+                <cylinderGeometry args={[0.085, 0.105, 0.16, 16]} />
+                <meshStandardMaterial color="#0D1033" metalness={0.6} roughness={0.3} />
+              </mesh>
+              <mesh position={[0.16, -0.48, 0]}>
+                <cylinderGeometry args={[0.085, 0.105, 0.16, 16]} />
+                <meshStandardMaterial color="#0D1033" metalness={0.6} roughness={0.3} />
+              </mesh>
+              {/* пламя — плоский неон, как след игрока в игре */}
+              <mesh ref={flameL} position={[-0.16, -0.78, 0]} rotation-x={Math.PI}>
+                <coneGeometry args={[0.095, 0.42, 12]} />
+                <meshBasicMaterial color={NU_NEON} transparent opacity={0.8} depthWrite={false} />
+              </mesh>
+              <mesh ref={flameR} position={[0.16, -0.78, 0]} rotation-x={Math.PI}>
+                <coneGeometry args={[0.095, 0.42, 12]} />
+                <meshBasicMaterial color={NU_NEON} transparent opacity={0.8} depthWrite={false} />
+              </mesh>
+            </group>
+            {/* реактивный след — неоновый луч под телом, видим с фронта */}
+            <mesh ref={trail} position={[SHEAR * -1.5, -1.82, 0]} rotation-x={Math.PI}>
+              <coneGeometry args={[0.3, 0.9, 16]} />
+              <meshBasicMaterial color={NU_NEON} transparent opacity={0.25} depthWrite={false} />
+            </mesh>
+            <group position={[SHEAR * 1.45, 1.42, 0]}>
+              <mesh position={[0, 0.2, 0]}>
+                <cylinderGeometry args={[0.026, 0.032, 0.46, 10]} />
+                <meshStandardMaterial color="#16132E" metalness={0.55} roughness={0.35} />
+              </mesh>
+              <mesh ref={antDot} position={[0, 0.5, 0]}>
+                <sphereGeometry args={[0.068, 16, 16]} />
+                <meshBasicMaterial color={NU_NEON} />
+              </mesh>
+              {[0, 1, 2].map((ri) => (
+                <mesh
+                  key={ri}
+                  ref={(el) => {
+                    antRings.current[ri] = el;
+                  }}
+                  position={[0, 0.5, 0]}
+                  scale={0.001}
+                >
+                  <torusGeometry args={[0.15 + ri * 0.088, 0.02, 8, 28]} />
+                  <meshBasicMaterial color="#ffffff" transparent opacity={0} depthWrite={false} />
+                </mesh>
+              ))}
+            </group>
+          </group>
+        )}
       </group>
 
       <mesh
@@ -422,7 +591,7 @@ function Mascot({ mode }: { mode: Mode }) {
       <directionalLight position={[3, 5, 4]} intensity={0.4} />
       {/* key: окружение печётся один раз, при смене скина пересобираем */}
       <Environment key={skin} resolution={256} frames={1}>
-        {skin === "candy" ? (
+        {skin === "candy" || skin === "nu" ? (
           <>
             {/* большие мягкие панели: ровный шёлковый глянец без резких «рамок» */}
             <Lightformer
@@ -439,6 +608,16 @@ function Mascot({ mode }: { mode: Mode }) {
               scale={[4, 5, 1]}
               color="#dfe8ff"
             />
+            {/* неон-подсветка магентой — только для скина игры */}
+            {skin === "nu" && (
+              <Lightformer
+                intensity={1.8}
+                position={[2.6, 1.5, 4]}
+                rotation-y={-0.4}
+                scale={[0.6, 6, 1]}
+                color={NU_NEON}
+              />
+            )}
           </>
         ) : (
           <>
