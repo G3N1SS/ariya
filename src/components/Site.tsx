@@ -153,17 +153,26 @@ export default function Site({ locale }: { locale: Locale }) {
                       <i key={tech}>{tech}</i>
                     ))}
                   </div>
-                  <a
-                    className="btn btn-ghost btn-sm cl-btn"
-                    href={c.link}
-                    target="_blank"
-                    rel="noopener"
-                    data-magnetic
-                  >
-                    {c.linkLabel} ↗
-                  </a>
+                  <div className="cl-actions">
+                    <a
+                      className="btn btn-primary btn-sm cl-btn"
+                      href={c.pageHref}
+                      data-magnetic
+                    >
+                      {c.pageLabel}
+                    </a>
+                    <a
+                      className="btn btn-ghost btn-sm cl-btn"
+                      href={c.link}
+                      target="_blank"
+                      rel="noopener"
+                      data-magnetic
+                    >
+                      {c.linkLabel} ↗
+                    </a>
+                  </div>
                 </div>
-                <div className="cl-shot">
+                <a className="cl-shot" href={c.pageHref} aria-label={c.title}>
                   <img
                     src={c.img}
                     alt={c.alt}
@@ -171,7 +180,7 @@ export default function Site({ locale }: { locale: Locale }) {
                     height={693}
                     loading="lazy"
                   />
-                </div>
+                </a>
               </div>
               <div className="stamp">
                 <div>
