@@ -56,9 +56,10 @@ export default function Preloader() {
     if (document.readyState === "complete") loadDone();
     else window.addEventListener("load", loadDone, { once: true });
 
-    // где будет 3D (теперь и мобильные) — ждём сцену, с предохранителем
+    // сцену ждём только на десктопе: мобильные монтируют 3D после загрузки
+    // в idle — лоадер там не должен держать людей ради компиляции шейдеров
     let sceneTimer = 0;
-    if (can3d()) {
+    if (can3d() && matchMedia("(pointer: fine)").matches) {
       const sceneDone = track();
       sceneTimer = window.setTimeout(sceneDone, 6000);
       window.addEventListener(
