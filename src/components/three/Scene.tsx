@@ -488,9 +488,24 @@ function Composition() {
     // клоны задетых текстов живут ПРЯМО в body: любой позиционированный
     // контейнер-обёртка создал бы стекинг-контекст и отрезал difference
     // от канваса с фоном — бленд обязан жить в корневом контексте
+    //
+    // тексты на непрозрачной подложке (свой фон или у предка, как .svc-plus)
+    // лого не задевает — панель перекрывает канвас; вырезать в них дырку
+    // значит светить фоном страницы сквозь панель
+    const occluded = (el: HTMLElement) => {
+      for (
+        let n: HTMLElement | null = el;
+        n && n !== document.body;
+        n = n.parentElement
+      ) {
+        const m = getComputedStyle(n).backgroundColor.match(/[\d.]+/g);
+        if (m && (m.length < 4 || Number(m[3]) > 0.55)) return true;
+      }
+      return false;
+    };
     s.invEls = Array.from(
       document.querySelectorAll<HTMLElement>(INV_SELECTOR)
-    );
+    ).filter((el) => !occluded(el));
 
     // сцена собрана — сообщаем прелоадеру и прячем статичный знак
     const raf = requestAnimationFrame(() => {
