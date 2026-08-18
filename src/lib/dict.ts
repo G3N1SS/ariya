@@ -1,8 +1,8 @@
 export type Locale = "en" | "ru";
 
-// Контакты появятся с материалами заказчика: TG-ссылка, почта, домен.
+// Контакты студии; почта и домен подъедут следом.
 export const contacts = {
-  tg: "#", // TODO: ссылка на Telegram
+  tg: "https://t.me/g3n1sss",
   email: "", // TODO: почта студии
 };
 
@@ -139,7 +139,6 @@ export const dict = {
         "No “$X and up” price lists — they lie anyway. We look at the task and give you an honest range.",
       btnTg: "Message on Telegram",
       btnMail: "Email us",
-      note: "// links go live as soon as contacts arrive",
       form: {
         hint: "// or assemble the brief right here — we’ll reply wherever suits you",
         name: "Name",
@@ -391,7 +390,6 @@ export const dict = {
         "Никаких прайсов «от…» — они всё равно врут. Смотрим задачу и называем честную вилку.",
       btnTg: "Написать в Telegram",
       btnMail: "Написать на почту",
-      note: "// ссылки оживут, как только пришлёте контакты",
       form: {
         hint: "// или соберите бриф прямо здесь — ответим туда, куда удобнее вам",
         name: "Имя",

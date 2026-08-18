@@ -52,7 +52,13 @@ export default function Site({ locale }: { locale: Locale }) {
             <a className="locale-switch" href={t.localeSwitch.href}>
               {t.localeSwitch.label}
             </a>
-            <a className="btn btn-primary btn-sm" href={tgHref} data-magnetic>
+            <a
+              className="btn btn-primary btn-sm"
+              href={tgHref}
+              target="_blank"
+              rel="noopener"
+              data-magnetic
+            >
               {t.headerCta}
             </a>
           </div>
@@ -73,7 +79,13 @@ export default function Site({ locale }: { locale: Locale }) {
             </h1>
             <p className="hero-sub">{t.hero.sub}</p>
             <div className="hero-cta">
-              <a className="btn btn-primary" href={tgHref} data-magnetic>
+              <a
+                className="btn btn-primary"
+                href={tgHref}
+                target="_blank"
+                rel="noopener"
+                data-magnetic
+              >
                 {t.hero.ctaPrimary}
               </a>
               <a className="btn btn-ghost" href="#work" data-magnetic>
@@ -202,21 +214,27 @@ export default function Site({ locale }: { locale: Locale }) {
               {t.cta.sub}
             </p>
             <div className="cta-actions" data-reveal>
-              <a className="btn btn-primary" href={tgHref} data-magnetic>
+              <a
+                className="btn btn-primary"
+                href={tgHref}
+                target="_blank"
+                rel="noopener"
+                data-magnetic
+              >
                 {t.cta.btnTg}
               </a>
-              <a className="btn btn-ghost" href={mailHref} data-magnetic>
-                {t.cta.btnMail}
-              </a>
+              {/* почтовая кнопка появится вместе с почтой — мёртвых ссылок не держим */}
+              {contacts.email && (
+                <a className="btn btn-ghost" href={mailHref} data-magnetic>
+                  {t.cta.btnMail}
+                </a>
+              )}
             </div>
             <div data-reveal>
               <LeadForm t={t.cta.form} />
             </div>
             <p className="cta-pricing" data-reveal>
               {t.cta.pricing}
-            </p>
-            <p className="cta-note" data-reveal>
-              {t.cta.note}
             </p>
           </div>
           <Ticker text={t.cta.ticker} className="cta-ticker" />
