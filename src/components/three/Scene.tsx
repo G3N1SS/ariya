@@ -89,6 +89,34 @@ const INV_STYLE_PROPS = [
   "wordSpacing",
   "padding",
 ] as const;
+// и потомкам тоже — иначе scoped-селекторы (.hero h1 .l2 и т.п.) не сработают
+// в клоне, и переносы строк разъедутся с оригиналом
+const INV_KID_PROPS = [
+  "display",
+  "margin",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "fontStyle",
+  "letterSpacing",
+  "lineHeight",
+  "whiteSpace",
+  "textTransform",
+  "verticalAlign",
+] as const;
+
+// инверсная база: difference от фона B возвращает исходный цвет T —
+// X = B±T поканально; работает в обеих темах без ручных таблиц
+function invBase(color: string, bg: [number, number, number]) {
+  const m = color.match(/\d+/g);
+  if (!m) return color;
+  const x = [0, 1, 2].map((i) => {
+    const t = Number(m[i] ?? 0);
+    const b = bg[i];
+    return Math.max(0, Math.min(255, b > 127 ? b - t : b + t));
+  });
+  return `rgb(${x[0]},${x[1]},${x[2]})`;
+}
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -139,10 +167,11 @@ function HeroField() {
   const dark = useDarkTheme();
 
   const sim = useMemo(() => {
-    // мобильный профиль: втрое меньше точек — телефонному GPU хватает;
-    // рассыпное облако при сборке компактнее — не сыплется на текст
-    const N = isCoarse() ? [220, 320, 220] : FIELD.n;
-    const scatter = isCoarse() ? 2.2 : FIELD.scatter;
+    // компактный профиль — от РАСКЛАДКИ (узкое окно), не от типа указателя:
+    // меньше точек, рассыпное облако прижато к знаку — не сыплется на текст
+    const compact = window.innerWidth < 900;
+    const N = compact ? [220, 320, 220] : FIELD.n;
+    const scatter = compact ? 2.2 : FIELD.scatter;
     const total = N[0] + N[1] + N[2];
     const tgt = new Float32Array(total * 3);
     const pos = new Float32Array(total * 3);
@@ -244,12 +273,12 @@ function HeroField() {
     if (!p.visible) return;
 
     // строй живёт глубже сцены и крупнее лого: эхо, а не дубль;
-    // на таче — компактнее и у знака сверху, чтобы не сыпаться на текст
+    // в узком окне — компактнее и у знака сверху, чтобы не лезть на текст
     const depthK = (7 + FIELD.depth) / 7;
-    const coarse = isCoarse();
-    const S = viewport.height * 0.155 * (coarse ? 1.05 : 1.5) * depthK;
+    const compact = window.innerWidth < 900;
+    const S = viewport.height * 0.155 * (compact ? 1.05 : 1.5) * depthK;
     p.scale.setScalar(S);
-    if (coarse)
+    if (compact)
       p.position.set(0, 0.22 * viewport.height * depthK, -FIELD.depth);
     else p.position.set(0.21 * viewport.width * depthK, 0, -FIELD.depth);
 
@@ -332,6 +361,7 @@ function Composition() {
     lastPX: 0,
     lastPY: 0,
     coarse: isCoarse(),
+    narrow: false, // мобильная раскладка (<900px) — ставится в measure()
     entrance: document.documentElement.classList.contains("is-loaded") ? 1 : 0,
     stops: [0, 0.18, 0.38, 0.58, 0.78, 1],
     docH: 1,
@@ -357,6 +387,7 @@ function Composition() {
     const s = st.current;
 
     const measure = () => {
+      s.narrow = window.innerWidth < 900;
       s.docH = Math.max(
         1,
         document.documentElement.scrollHeight - window.innerHeight
@@ -493,7 +524,7 @@ function Composition() {
     if (loaded && s.entrance < 1)
       s.entrance = Math.min(1, s.entrance + d * 1.1);
     const enterPose =
-      s.coarse && s.heroAnchor
+      s.narrow && s.heroAnchor
         ? { ...ENTER, x: s.heroAnchor.x, y: s.heroAnchor.y, z: 0.8, s: s.heroAnchor.s * 0.55 }
         : ENTER;
 
@@ -613,14 +644,30 @@ function Composition() {
         const clone = s.invActive.get(el);
         if (hit && !clone) {
           // накрываем оригинал клоном с difference: тот же текст, та же метрика
+          const bgm = getComputedStyle(document.body)
+            .backgroundColor.match(/\d+/g);
+          const bg: [number, number, number] = bgm
+            ? [Number(bgm[0]), Number(bgm[1]), Number(bgm[2])]
+            : [255, 255, 255];
           const c = document.createElement("div");
-          c.className =
-            "inv-clone" + (el.classList.contains("idx") ? " blue" : "");
+          c.className = "inv-clone";
           const cs = getComputedStyle(el) as unknown as Record<string, string>;
           const st2 = c.style as unknown as Record<string, string>;
           for (const p of INV_STYLE_PROPS) st2[p] = cs[p];
-          // innerHTML: клон сохраняет вложенные спаны (двухцветный h1 и т.п.)
+          c.style.color = invBase(cs.color, bg);
+          // innerHTML + вычисленные стили каждому потомку: scoped-селекторы
+          // оригинала в клоне не работают — копируем раскладку и цвет руками
           c.innerHTML = el.innerHTML;
+          const srcKids = el.querySelectorAll<HTMLElement>("*");
+          const dstKids = c.querySelectorAll<HTMLElement>("*");
+          srcKids.forEach((sk, ki) => {
+            const dk = dstKids[ki];
+            if (!dk) return;
+            const ks = getComputedStyle(sk) as unknown as Record<string, string>;
+            const ds = dk.style as unknown as Record<string, string>;
+            for (const p of INV_KID_PROPS) ds[p] = ks[p];
+            dk.style.color = invBase(ks.color, bg);
+          });
           c.style.width = r.width + "px";
           c.style.transform = `translate(${r.left}px, ${r.top}px)`;
           document.body.appendChild(c);

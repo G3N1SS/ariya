@@ -1616,18 +1616,10 @@ html.has-3d .hero-visual svg {
 }
 
 /* ── инверсия текста под пролетающим лого ── */
-/* базовые цвета подобраны так, что difference от фона даёт РОВНО фирменные:
-   |#F2EFCC − #FFF| = #0D1033 (ink), |#F3A100 − #FFF| = #0C5EFF (blue) */
-:root {
-  --inv-ink: #f2efcc;
-  --inv-blue: #f3a100;
-}
-html[data-theme="dark"] {
-  --inv-ink: #f2f9ff;
-  --inv-blue: #3780ff;
-}
 /* клон живёт прямо в body (корневой стекинг-контекст): difference видит
-   и канвас с лого, и белый фон — инвертируются только накрытые пиксели */
+   и канвас с лого, и фон — инвертируются только накрытые пиксели.
+   Цвета-базы клону и его спанам считает JS из фактических цветов и фона:
+   difference(B±T, B) = T — на свободных участках текст неотличим от оригинала */
 .inv-clone {
   position: fixed;
   left: 0;
@@ -1636,20 +1628,7 @@ html[data-theme="dark"] {
   z-index: 3;
   pointer-events: none;
   mix-blend-mode: difference;
-  color: var(--inv-ink);
   will-change: transform;
-}
-.inv-clone.blue {
-  color: var(--inv-blue);
-}
-/* вложенные цветные спаны клона: синяя строка h1 инвертируется от своей базы */
-.inv-clone .l2,
-.inv-clone i {
-  color: var(--inv-blue);
-  font-style: normal;
-}
-.inv-clone .hero-greet {
-  color: var(--inv-ink);
 }
 /* оригинал на время инверсии прозрачен: клон рисует те же глифы поверх */
 .inv-src {
