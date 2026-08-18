@@ -136,27 +136,71 @@ export default function Site({ locale }: { locale: Locale }) {
           <p className="intro" data-reveal>
             {t.cases.intro}
           </p>
-          {[1, 2].map((n) => (
-            <div className="case-poster" key={n} data-reveal>
-              <span className="tag">{`// case-0${n}`}</span>
+          {t.cases.items.map((c) => (
+            <div className="case-poster case-live" key={c.id} data-reveal>
+              <span className="tag">{`// ${c.tag}`}</span>
               <span className="tickmark tm-tl"></span>
               <span className="tickmark tm-tr"></span>
               <span className="tickmark tm-bl"></span>
               <span className="tickmark tm-br"></span>
-              <div className="case-empty">
-                <b>{t.cases.placeholderTitle}</b>
-                <span>{t.cases.placeholderNote}</span>
+              <div className="cl-grid">
+                <div className="cl-copy">
+                  <span className="cl-client">{c.client}</span>
+                  <h3>{c.title}</h3>
+                  <p>{c.text}</p>
+                  <div className="cl-stack">
+                    {c.stack.map((tech) => (
+                      <i key={tech}>{tech}</i>
+                    ))}
+                  </div>
+                  <a
+                    className="btn btn-ghost btn-sm cl-btn"
+                    href={c.link}
+                    target="_blank"
+                    rel="noopener"
+                    data-magnetic
+                  >
+                    {c.linkLabel} ↗
+                  </a>
+                </div>
+                <div className="cl-shot">
+                  <img
+                    src={c.img}
+                    alt={c.alt}
+                    width={500}
+                    height={693}
+                    loading="lazy"
+                  />
+                </div>
               </div>
-              <div className="dim">1440 × 900</div>
               <div className="stamp">
                 <div>
-                  {`case-0${n} `}
-                  <i>{"//"}</i> {t.cases.stampSoon}
+                  {`${c.tag} `}
+                  <i>{"//"}</i> live
                 </div>
                 <div>2026 · ariya</div>
               </div>
             </div>
           ))}
+          <div className="case-poster" data-reveal>
+            <span className="tag">{"// case-02"}</span>
+            <span className="tickmark tm-tl"></span>
+            <span className="tickmark tm-tr"></span>
+            <span className="tickmark tm-bl"></span>
+            <span className="tickmark tm-br"></span>
+            <div className="case-empty">
+              <b>{t.cases.placeholderTitle}</b>
+              <span>{t.cases.placeholderNote}</span>
+            </div>
+            <div className="dim">1440 × 900</div>
+            <div className="stamp">
+              <div>
+                {"case-02 "}
+                <i>{"//"}</i> {t.cases.stampSoon}
+              </div>
+              <div>2026 · ariya</div>
+            </div>
+          </div>
           <p className="case-closing" data-reveal>
             {t.cases.closing}
           </p>

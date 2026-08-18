@@ -454,6 +454,71 @@ html[lang="ru"] .hero h1 {
 .case-poster + .case-poster {
   margin-top: 20px;
 }
+/* живой кейс: текст слева, телефонный кадр справа */
+.case-live {
+  padding: clamp(24px, 4vw, 48px);
+}
+.cl-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(20px, 3.5vw, 48px);
+  align-items: center;
+  width: 100%;
+}
+.cl-client {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--blue);
+}
+.cl-copy h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 3.2vw, 36px);
+  margin: 10px 0 12px;
+}
+.cl-copy p {
+  color: var(--ink-60);
+  max-width: 46ch;
+}
+.cl-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+.cl-stack i {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-60);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 4px 10px;
+}
+.cl-btn {
+  margin-top: 20px;
+}
+.cl-shot {
+  display: flex;
+  justify-content: center;
+}
+.cl-shot img {
+  width: min(300px, 100%);
+  height: auto;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  box-shadow: 0 26px 60px rgba(13, 16, 51, 0.2);
+}
+@media (max-width: 860px) {
+  .cl-grid {
+    grid-template-columns: 1fr;
+  }
+  .cl-shot img {
+    width: min(260px, 86%);
+  }
+}
 .case-poster::before {
   content: "";
   position: absolute;
