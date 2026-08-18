@@ -507,7 +507,7 @@ function Composition() {
       document.documentElement.classList.remove("has-3d");
       s.invActive.forEach((clone, el) => {
         clone.remove();
-        el.classList.remove("inv-src");
+        el.style.clipPath = "";
       });
       s.invActive.clear();
     };
@@ -641,9 +641,11 @@ function Composition() {
           r.width > 0 &&
           r.left < maxX + pad && r.right > minX - pad &&
           r.top < maxY + pad && r.bottom > minY - pad;
-        const clone = s.invActive.get(el);
+        let clone = s.invActive.get(el);
         if (hit && !clone) {
-          // накрываем оригинал клоном с difference: тот же текст, та же метрика
+          // клон с difference: тот же текст, та же метрика; живёт в PAGE-
+          // координатах (absolute) — на телефоне скроллится с текстом нативно,
+          // без отставания fixed-слоя на кадр
           const bgm = getComputedStyle(document.body)
             .backgroundColor.match(/\d+/g);
           const bg: [number, number, number] = bgm
@@ -669,17 +671,38 @@ function Composition() {
             dk.style.color = invBase(ks.color, bg);
           });
           c.style.width = r.width + "px";
-          c.style.transform = `translate(${r.left}px, ${r.top}px)`;
+          c.style.transform = `translate(${r.left + window.scrollX}px, ${
+            r.top + window.scrollY
+          }px)`;
           document.body.appendChild(c);
-          el.classList.add("inv-src");
           s.invActive.set(el, c);
+          clone = c;
         } else if (!hit && clone) {
           clone.remove();
-          el.classList.remove("inv-src");
+          el.style.clipPath = "";
           s.invActive.delete(el);
-        } else if (clone) {
+          clone = undefined;
+        }
+        if (clone) {
+          // комплементарный клиппинг: клон видим ТОЛЬКО в прямоугольнике лого,
+          // оригинал — везде, кроме него (дырка polygon evenodd). Вне зоны
+          // текст остаётся нетронутым оригиналом — никаких сдвигов цвета
+          const ix1 = Math.max(minX - pad, r.left);
+          const iy1 = Math.max(minY - pad, r.top);
+          const ix2 = Math.min(maxX + pad, r.right);
+          const iy2 = Math.min(maxY + pad, r.bottom);
+          const lx1 = (ix1 - r.left).toFixed(1);
+          const ly1 = (iy1 - r.top).toFixed(1);
+          const lx2 = (ix2 - r.left).toFixed(1);
+          const ly2 = (iy2 - r.top).toFixed(1);
+          const w = r.width.toFixed(1);
+          const h = r.height.toFixed(1);
+          clone.style.clipPath = `inset(${ly1}px ${(r.width - Number(lx2)).toFixed(1)}px ${(r.height - Number(ly2)).toFixed(1)}px ${lx1}px)`;
+          el.style.clipPath = `polygon(evenodd, 0 0, ${w}px 0, ${w}px ${h}px, 0 ${h}px, 0 0, ${lx1}px ${ly1}px, ${lx2}px ${ly1}px, ${lx2}px ${ly2}px, ${lx1}px ${ly2}px, ${lx1}px ${ly1}px)`;
           clone.style.width = r.width + "px";
-          clone.style.transform = `translate(${r.left}px, ${r.top}px)`;
+          clone.style.transform = `translate(${r.left + window.scrollX}px, ${
+            r.top + window.scrollY
+          }px)`;
         }
       }
     }

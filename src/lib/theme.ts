@@ -38,14 +38,16 @@ function withFade(cb: () => void) {
     startViewTransition?: (cb: () => void) => {
       finished?: Promise<void>;
       ready?: Promise<void>;
+      updateCallbackDone?: Promise<void>;
     };
   };
   if (doc.startViewTransition) {
     // в скрытой вкладке переход абортится — DOM всё равно обновляется,
-    // а отклонённые промисы не должны шуметь в консоли
+    // а отклонённые промисы (все три) не должны шуметь в консоли
     const vt = doc.startViewTransition(cb);
     vt?.finished?.catch(() => {});
     vt?.ready?.catch(() => {});
+    vt?.updateCallbackDone?.catch(() => {});
   } else cb();
 }
 
