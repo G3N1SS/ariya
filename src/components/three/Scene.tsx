@@ -325,8 +325,7 @@ function Composition() {
     // якорь хиро-позы: центр и размер бокса статичного знака — на мобиле
     // лого встаёт ровно на его место и не наезжает на заголовок
     heroAnchor: null as { x: number; y: number; s: number } | null,
-    // инверсия задетых текстов: слой клонов над канвасом + активные пары
-    invLayer: null as HTMLDivElement | null,
+    // инверсия задетых текстов: клоны в body + активные пары
     invEls: [] as HTMLElement[],
     invActive: new Map<HTMLElement, HTMLElement>(),
     invBox: new THREE.Box3(),
@@ -433,12 +432,9 @@ function Composition() {
     window.addEventListener("resize", measure);
     window.addEventListener("ariya:loaded", onLoaded);
 
-    // слой инверсии: клоны задетых текстов живут над канвасом (root-контекст),
-    // поэтому difference-бленд видит и лого, и фон — в обход z-index у main
-    const layer = document.createElement("div");
-    layer.className = "inv-layer";
-    document.body.appendChild(layer);
-    s.invLayer = layer;
+    // клоны задетых текстов живут ПРЯМО в body: любой позиционированный
+    // контейнер-обёртка создал бы стекинг-контекст и отрезал difference
+    // от канваса с фоном — бленд обязан жить в корневом контексте
     s.invEls = Array.from(
       document.querySelectorAll<HTMLElement>(INV_SELECTOR)
     );
@@ -457,10 +453,11 @@ function Composition() {
       window.removeEventListener("resize", measure);
       window.removeEventListener("ariya:loaded", onLoaded);
       document.documentElement.classList.remove("has-3d");
-      s.invActive.forEach((_, el) => el.classList.remove("inv-src"));
+      s.invActive.forEach((clone, el) => {
+        clone.remove();
+        el.classList.remove("inv-src");
+      });
       s.invActive.clear();
-      layer.remove();
-      s.invLayer = null;
     };
   }, []);
 
@@ -563,7 +560,7 @@ function Composition() {
     });
 
     // ── инверсия задетого текста: экранный bbox лого против rect'ов текстов ──
-    if (s.entrance > 0.85 && s.invLayer) {
+    if (s.entrance > 0.85 && s.invEls.length) {
       const box = s.invBox.setFromObject(g);
       const v = s.invV;
       let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
@@ -599,7 +596,7 @@ function Composition() {
           c.textContent = el.textContent;
           c.style.width = r.width + "px";
           c.style.transform = `translate(${r.left}px, ${r.top}px)`;
-          s.invLayer.appendChild(c);
+          document.body.appendChild(c);
           el.classList.add("inv-src");
           s.invActive.set(el, c);
         } else if (!hit && clone) {

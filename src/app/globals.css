@@ -1626,17 +1626,15 @@ html[data-theme="dark"] {
   --inv-ink: #f2f9ff;
   --inv-blue: #3780ff;
 }
-.inv-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-}
+/* клон живёт прямо в body (корневой стекинг-контекст): difference видит
+   и канвас с лого, и белый фон — инвертируются только накрытые пиксели */
 .inv-clone {
   position: fixed;
   left: 0;
   top: 0;
   margin: 0;
+  z-index: 3;
+  pointer-events: none;
   mix-blend-mode: difference;
   color: var(--inv-ink);
   will-change: transform;
