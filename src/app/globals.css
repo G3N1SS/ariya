@@ -1642,6 +1642,15 @@ html[data-theme="dark"] {
 .inv-clone.blue {
   color: var(--inv-blue);
 }
+/* вложенные цветные спаны клона: синяя строка h1 инвертируется от своей базы */
+.inv-clone .l2,
+.inv-clone i {
+  color: var(--inv-blue);
+  font-style: normal;
+}
+.inv-clone .hero-greet {
+  color: var(--inv-ink);
+}
 /* оригинал на время инверсии прозрачен: клон рисует те же глифы поверх */
 .inv-src {
   color: transparent !important;

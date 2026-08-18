@@ -55,6 +55,9 @@ const SECTION_IDS = ["services", "work", "why", "process", "contact"];
 
 // тексты, через которые пролетает лого: при пересечении инвертируем задетое
 const INV_SELECTOR = [
+  ".hero h1",
+  ".hero-sub",
+  ".eyebrow",
   ".s-head h2",
   ".s-head .idx",
   ".intro",
@@ -136,8 +139,10 @@ function HeroField() {
   const dark = useDarkTheme();
 
   const sim = useMemo(() => {
-    // мобильный профиль: втрое меньше точек — телефонному GPU хватает
+    // мобильный профиль: втрое меньше точек — телефонному GPU хватает;
+    // рассыпное облако при сборке компактнее — не сыплется на текст
     const N = isCoarse() ? [220, 320, 220] : FIELD.n;
+    const scatter = isCoarse() ? 2.2 : FIELD.scatter;
     const total = N[0] + N[1] + N[2];
     const tgt = new Float32Array(total * 3);
     const pos = new Float32Array(total * 3);
@@ -159,8 +164,8 @@ function HeroField() {
         tgt[i * 3 + 1] = y;
         tgt[i * 3 + 2] = z;
         // рождаются в рассыпном облаке — после лоадера строй собирается сам
-        pos[i * 3] = x + (Math.random() - 0.5) * FIELD.scatter;
-        pos[i * 3 + 1] = y + (Math.random() - 0.5) * FIELD.scatter;
+        pos[i * 3] = x + (Math.random() - 0.5) * scatter;
+        pos[i * 3 + 1] = y + (Math.random() - 0.5) * scatter;
         pos[i * 3 + 2] = z + (Math.random() - 0.5) * 2;
         c.copy(bar === 0 ? cMid : cSide);
         c.offsetHSL(0, 0, (Math.random() - 0.5) * 0.06);
@@ -326,6 +331,7 @@ function Composition() {
     dragging: false,
     lastPX: 0,
     lastPY: 0,
+    coarse: isCoarse(),
     entrance: document.documentElement.classList.contains("is-loaded") ? 1 : 0,
     stops: [0, 0.18, 0.38, 0.58, 0.78, 1],
     docH: 1,
@@ -481,10 +487,15 @@ function Composition() {
     const t = frame.clock.elapsedTime;
     const d = Math.min(dt, 0.05);
 
-    // вход после лоадера
+    // вход после лоадера; на таче сцена монтируется позже и отдельно —
+    // никаких пролётов из центра над текстом: лого растёт прямо на якоре
     const loaded = document.documentElement.classList.contains("is-loaded");
     if (loaded && s.entrance < 1)
       s.entrance = Math.min(1, s.entrance + d * 1.1);
+    const enterPose =
+      s.coarse && s.heroAnchor
+        ? { ...ENTER, x: s.heroAnchor.x, y: s.heroAnchor.y, z: 0.8, s: s.heroAnchor.s * 0.55 }
+        : ENTER;
 
     // сегмент скролла → поза (с динамическим финалом-«парковкой» в wordmark);
     // финальная поза каждый кадр строится от текущего scrollY — бруски
@@ -524,7 +535,7 @@ function Composition() {
     const arc = Math.sin(tt * Math.PI);
     pose.y += arc * 0.04;
     pose.z += arc * 0.35;
-    pose = lerpPose(ENTER, pose, smooth(s.entrance));
+    pose = lerpPose(enterPose, pose, smooth(s.entrance));
 
     // drag с мягким возвратом
     if (!s.dragging) {
@@ -608,7 +619,8 @@ function Composition() {
           const cs = getComputedStyle(el) as unknown as Record<string, string>;
           const st2 = c.style as unknown as Record<string, string>;
           for (const p of INV_STYLE_PROPS) st2[p] = cs[p];
-          c.textContent = el.textContent;
+          // innerHTML: клон сохраняет вложенные спаны (двухцветный h1 и т.п.)
+          c.innerHTML = el.innerHTML;
           c.style.width = r.width + "px";
           c.style.transform = `translate(${r.left}px, ${r.top}px)`;
           document.body.appendChild(c);
