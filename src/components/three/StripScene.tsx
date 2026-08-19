@@ -314,10 +314,11 @@ function World() {
     const vw = f.viewport.width;
     const xs = XS.map((fr) => fr * vw);
 
-    // наклон мира за курсором + вертикальный параллакс слоёв
+    // наклон мира за курсором + вертикальный параллакс слоёв;
+    // мир сидит чуть ниже центра — запас сверху под дуги прыжков
     world.current.rotation.x = lerp(world.current.rotation.x, -s.mouse.y * 0.05, k);
     world.current.rotation.y = lerp(world.current.rotation.y, s.mouse.x * 0.07, k);
-    world.current.position.y = lerp(world.current.position.y, s.d * 0.7, k);
+    world.current.position.y = lerp(world.current.position.y, -0.25 + s.d * 0.7, k);
     starsA.current.position.y = s.d * 1.3;
     starsB.current.position.y = s.d * 1.9;
     (starsA.current.material as THREE.PointsMaterial).opacity =
@@ -363,7 +364,7 @@ function World() {
       const j = s.i + 1;
       px = lerp(xs[s.i], xs[j], p);
       py = lerp(TOPS[s.i], TOPS[j], p);
-      arc = Math.sin(Math.PI * p) * 1.45;
+      arc = Math.sin(Math.PI * p) * 1.15;
       flare = Math.sin(Math.PI * Math.min(1, p * 1.4));
       if (p >= 1) {
         s.i = j;
@@ -377,7 +378,7 @@ function World() {
       const p = Math.min(1, el / BACK);
       px = lerp(xs[4], xs[0], p);
       py = lerp(TOPS[4], TOPS[0], p);
-      arc = Math.sin(Math.PI * p) * 2.9;
+      arc = Math.sin(Math.PI * p) * 2.05;
       flare = Math.sin(Math.PI * p);
       if (p >= 1) {
         s.i = 0;
@@ -586,7 +587,7 @@ export default function StripScene() {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0.3, 10], fov: 33 }}
+      camera={{ position: [0, 0.55, 12], fov: 33 }}
       gl={{ alpha: true, antialias: true }}
       style={{ touchAction: "pan-y" }}
     >
