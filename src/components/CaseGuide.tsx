@@ -134,17 +134,18 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     };
 
     const vignVisible = () => innerWidth >= 1160;
+    // пролёт широкий: парковки почти у краёв экрана, зигзаг во всю ширину
     const parkX = (side: WpDef["side"], s: number) => {
       if (side === "c") return innerWidth / 2;
       const margin = Math.max(0, (innerWidth - 880) / 2);
       if (side === "v" && vignVisible())
         return Math.min(innerWidth - (W * s) / 2 - 10, (innerWidth + 880) / 2 + 96);
-      const lx = Math.max((W * s) / 2 + 14, margin * 0.55 + 40);
+      const lx = Math.max((W * s) / 2 + 12, margin * 0.3 + 26);
       return side === "l" ? lx : innerWidth - lx;
     };
     const parkY = (i: number) => {
       if (i === 0) return innerHeight * 0.36;
-      return innerHeight * (0.42 + (i % 2) * 0.05);
+      return innerHeight * (i % 2 ? 0.4 : 0.52);
     };
 
     // ── сцены-перформансы: прожектор и оживающие виньетки ──
@@ -192,6 +193,36 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       );
     };
 
+    // ── плавный скролл с воротами сцен: колесо копит цель, страница скользит;
+    // несыгранная сцена по пути вниз мягко причаливает скролл к себе,
+    // отыгрывает главный бит и отпускает; настойчивое колесо прорывает ворота
+    const sm = {
+      target: scrollY,
+      cur: scrollY,
+      lastWrite: scrollY,
+      gateI: -1,
+      gateY: 0,
+      gateUntil: 0,
+      gateT0: 0,
+    };
+    // сцены, которые юзер осознанно пробил колесом — ворота их больше не держат
+    const skipped = new Set<number>();
+    const sceneHold = (wp: WpDef) => {
+      if (!wp.scene || wp.scene === "dive") return 0;
+      if (wp.scene === "spot") return 1900;
+      if (wp.scene === "vign1" || wp.scene === "vign2") return 1500;
+      const n = wp.spotSel ? document.querySelectorAll(wp.spotSel).length : 0;
+      return Math.min(4000, 800 + n * 700);
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return;
+      e.preventDefault();
+      const d = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      const maxY = document.documentElement.scrollHeight - innerHeight;
+      sm.target = clamp(sm.target + d, 0, maxY);
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+
     let lastArrived = -1;
     let raf = 0;
     let lastT = performance.now();
@@ -201,7 +232,50 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       lastT = now;
       if (!stops.length || !w) return;
 
-      const yq = scrollY;
+      // клавиатура/скроллбар двигают страницу сами — отдаём им управление
+      if (Math.abs(scrollY - sm.lastWrite) > 2) {
+        sm.target = sm.cur = scrollY;
+        sm.gateI = -1;
+      }
+      const maxY = document.documentElement.scrollHeight - innerHeight;
+      sm.target = clamp(sm.target, 0, maxY);
+      let tgt = sm.target;
+      if (sm.gateI === -1 && tgt > sm.cur + 4) {
+        for (let gi = 0; gi < stops.length; gi++) {
+          const sp = stops[gi];
+          if (
+            sp.y > sm.cur + 6 &&
+            sp.y <= tgt &&
+            sp.wp.scene &&
+            sp.wp.scene !== "dive" &&
+            !said.current.has("scene:" + gi) &&
+            !skipped.has(gi)
+          ) {
+            sm.gateI = gi;
+            sm.gateY = sp.y;
+            sm.gateUntil = 0;
+            sm.gateT0 = sm.target;
+            break;
+          }
+        }
+      }
+      if (sm.gateI !== -1) {
+        tgt = Math.min(tgt, sm.gateY);
+        if (!sm.gateUntil && Math.abs(sm.cur - sm.gateY) < 6)
+          sm.gateUntil = now + sceneHold(stops[sm.gateI].wp);
+        // прорыв = докрутка ПОСЛЕ постановки ворот, а не общий запас цели
+        const insist = sm.target - sm.gateT0 > 700;
+        if (insist) skipped.add(sm.gateI);
+        if ((sm.gateUntil && now > sm.gateUntil) || insist) sm.gateI = -1;
+      }
+      sm.cur = lerp(sm.cur, tgt, 1 - Math.pow(0.0025, dt));
+      // behavior instant: глобальный scroll-behavior smooth анимировал бы нашу
+      // же запись, и детектор внешнего скролла принимал бы её за юзера
+      if (Math.abs(sm.cur - scrollY) > 0.5)
+        window.scrollTo({ top: sm.cur, behavior: "instant" as ScrollBehavior });
+      sm.lastWrite = sm.cur;
+
+      const yq = sm.cur;
       let i = 0;
       while (i < stops.length - 1 && yq >= stops[i + 1].y) i++;
       const a = stops[i];
@@ -210,7 +284,10 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       const tt = a === b ? 0 : smooth(clamp((yq - a.y) / span, 0, 1));
 
       const tx = lerp(parkX(a.wp.side, a.wp.s), parkX(b.wp.side, b.wp.s), tt);
-      const ty = lerp(parkY(i), parkY(Math.min(i + 1, stops.length - 1)), tt);
+      // нырок-дуга в перелёте: траектория провисает, полёт читается телом
+      const ty =
+        lerp(parkY(i), parkY(Math.min(i + 1, stops.length - 1)), tt) +
+        Math.sin(Math.PI * tt) * innerHeight * 0.05;
       const ts = lerp(a.wp.s, b.wp.s, tt);
 
       const k = 1 - Math.pow(0.002, dt);
@@ -325,6 +402,7 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     return () => {
       cancelAnimationFrame(raf);
       cancelScene();
+      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("resize", rebuild);
       window.removeEventListener("load", rebuild);
       window.clearTimeout(settle);
