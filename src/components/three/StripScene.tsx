@@ -284,6 +284,35 @@ function World() {
     mouse: { x: 0, y: 0 },
     d: 0,
   });
+  // эстафета с гидом кейса: на десктопе джампер ждёт, пока гид нырнёт в ленту;
+  // без гида (мобилка, прямой заход) живёт с самого начала
+  const hand = useRef({
+    mode: (typeof window !== "undefined" &&
+    (window as unknown as Record<string, unknown>).__ariyaStripOwned === true
+      ? "hidden"
+      : "live") as "hidden" | "enter" | "live" | "exit",
+    t0: 0,
+    x0: 0,
+    y0: 0,
+    pendIn: false,
+    pendOut: false,
+  });
+
+  useEffect(() => {
+    const hd = hand.current;
+    const onIn = () => {
+      hd.pendIn = true;
+    };
+    const onOut = () => {
+      hd.pendOut = true;
+    };
+    window.addEventListener("ariya:strip-in", onIn);
+    window.addEventListener("ariya:strip-out", onOut);
+    return () => {
+      window.removeEventListener("ariya:strip-in", onIn);
+      window.removeEventListener("ariya:strip-out", onOut);
+    };
+  }, []);
 
   // параллакс: смещение центра ленты от центра вьюпорта; наклон — за мышью
   useEffect(() => {
@@ -350,44 +379,104 @@ function World() {
       l.scale.setScalar(1 + 0.15 * Math.sin(t * 3 + li) + s.flash[li] * 0.9);
     });
 
-    // машина прыжков: rest → jump к следующей эпохе; с 6G — сальто назад к 2G
-    const el = t - s.t0;
-    let px = xs[s.i];
-    let py = TOPS[s.i];
-    let arc = 0;
-    let flare = 0;
-    if (s.phase === "rest" && el > REST) {
-      s.t0 = t;
-      s.phase = s.i === 4 ? "back" : "jump";
-      if (s.phase === "back") s.spin += Math.PI * 2;
-    } else if (s.phase === "jump") {
-      const p = Math.min(1, el / JUMP);
-      const j = s.i + 1;
-      px = lerp(xs[s.i], xs[j], p);
-      py = lerp(TOPS[s.i], TOPS[j], p);
-      arc = Math.sin(Math.PI * p) * 1.15;
-      flare = Math.sin(Math.PI * Math.min(1, p * 1.4));
-      if (p >= 1) {
-        s.i = j;
-        s.lvl = j;
-        s.flash[j] = 1;
-        if (j === 4) s.happy = 1.2;
-        s.phase = "rest";
-        s.t0 = t;
-      }
-    } else if (s.phase === "back") {
-      const p = Math.min(1, el / BACK);
-      px = lerp(xs[4], xs[0], p);
-      py = lerp(TOPS[4], TOPS[0], p);
-      arc = Math.sin(Math.PI * p) * 2.1;
-      flare = Math.sin(Math.PI * p);
-      if (p >= 1) {
+    // эстафета: запрыгивание с неба на 2G / вылет сальто за верхнюю кромку
+    const hd = hand.current;
+    const g = jumpG.current;
+    if (hd.pendIn) {
+      hd.pendIn = false;
+      if (hd.mode === "hidden" || hd.mode === "exit") {
+        hd.mode = "enter";
+        hd.t0 = t;
         s.i = 0;
         s.lvl = 0;
+        s.phase = "rest";
+        s.spin = 0;
+        s.spinCur = 0;
+      }
+    }
+    if (hd.pendOut) {
+      hd.pendOut = false;
+      if (hd.mode === "live" || hd.mode === "enter") {
+        hd.mode = "exit";
+        hd.t0 = t;
+        hd.x0 = g.position.x;
+        hd.y0 = g.position.y;
+      }
+    }
+    g.visible = hd.mode !== "hidden";
+
+    let flare = 0;
+    if (hd.mode === "enter") {
+      // падает с неба на 2G с горящим следом; приземление ловит сквош машины
+      const q = Math.min(1, (t - hd.t0) / 0.65);
+      const landY = TOPS[0] + 0.06 + 1.45 * BODY_S;
+      g.position.set(xs[0], lerp(landY + 5.4, landY, q * q), 0);
+      flare = 1 - q * 0.35;
+      bodyG.current.scale.set(BODY_S, BODY_S * (1 + 0.12 * (1 - q)), BODY_S);
+      bodyG.current.rotation.z = 0;
+      if (q >= 1) {
+        hd.mode = "live";
         s.flash[0] = 1;
         s.phase = "rest";
         s.t0 = t;
       }
+    } else if (hd.mode === "exit") {
+      // взмывает с сальто и уходит из кадра — эстафету забрал гид
+      const q = Math.min(1, (t - hd.t0) / 0.75);
+      g.position.set(hd.x0 + q * 1.1, hd.y0 + 7 * q * q, 0);
+      bodyG.current.rotation.z = q * Math.PI * 2;
+      flare = 1;
+      if (q >= 1) hd.mode = "hidden";
+    } else if (hd.mode === "live") {
+      // машина прыжков: rest → jump к следующей эпохе; с 6G — сальто назад к 2G
+      const el = t - s.t0;
+      let px = xs[s.i];
+      let py = TOPS[s.i];
+      let arc = 0;
+      if (s.phase === "rest" && el > REST) {
+        s.t0 = t;
+        s.phase = s.i === 4 ? "back" : "jump";
+        if (s.phase === "back") s.spin += Math.PI * 2;
+      } else if (s.phase === "jump") {
+        const p = Math.min(1, el / JUMP);
+        const j = s.i + 1;
+        px = lerp(xs[s.i], xs[j], p);
+        py = lerp(TOPS[s.i], TOPS[j], p);
+        arc = Math.sin(Math.PI * p) * 1.15;
+        flare = Math.sin(Math.PI * Math.min(1, p * 1.4));
+        if (p >= 1) {
+          s.i = j;
+          s.lvl = j;
+          s.flash[j] = 1;
+          if (j === 4) s.happy = 1.2;
+          s.phase = "rest";
+          s.t0 = t;
+        }
+      } else if (s.phase === "back") {
+        const p = Math.min(1, el / BACK);
+        px = lerp(xs[4], xs[0], p);
+        py = lerp(TOPS[4], TOPS[0], p);
+        arc = Math.sin(Math.PI * p) * 2.1;
+        flare = Math.sin(Math.PI * p);
+        if (p >= 1) {
+          s.i = 0;
+          s.lvl = 0;
+          s.flash[0] = 1;
+          s.phase = "rest";
+          s.t0 = t;
+        }
+      }
+
+      const idleBob = s.phase === "rest" ? Math.sin(t * 2.4) * 0.05 : 0;
+      g.position.set(px, py + 0.06 + 1.45 * BODY_S + arc + idleBob, 0);
+
+      // сквош-стретч: вытяжка в полёте, приседание на приземлении
+      const elNow = t - s.t0;
+      const impact = s.phase === "rest" && elNow < 0.16 ? 1 - elNow / 0.16 : 0;
+      const sy = 1 + flare * 0.14 - impact * 0.16;
+      const sx = 1 - flare * 0.07 + impact * 0.1;
+      bodyG.current.scale.set(BODY_S * sx, BODY_S * sy, BODY_S * sx);
+      bodyG.current.rotation.z = s.spinCur;
     }
     s.happy = Math.max(0, s.happy - d);
 
@@ -397,18 +486,6 @@ function World() {
       s.spin = 0;
       s.spinCur = 0;
     }
-
-    const g = jumpG.current;
-    const idleBob = s.phase === "rest" ? Math.sin(t * 2.4) * 0.05 : 0;
-    g.position.set(px, py + 0.06 + 1.45 * BODY_S + arc + idleBob, 0);
-
-    // сквош-стретч: вытяжка в полёте, приседание на приземлении
-    const elNow = t - s.t0;
-    const impact = s.phase === "rest" && elNow < 0.16 ? 1 - elNow / 0.16 : 0;
-    const sy = 1 + flare * 0.14 - impact * 0.16;
-    const sx = 1 - flare * 0.07 + impact * 0.1;
-    bodyG.current.scale.set(BODY_S * sx, BODY_S * sy, BODY_S * sx);
-    bodyG.current.rotation.z = s.spinCur;
 
     // глаза: моргание в покое, счастливый прищур на 6G и в сальто
     const period = 4.2;

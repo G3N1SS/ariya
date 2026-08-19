@@ -145,6 +145,8 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     };
     const parkY = (i: number) => {
       if (i === 0) return innerHeight * 0.36;
+      // нырок — в самое сердце ленты, а не в воздух над ней
+      if (WPS[i].scene === "dive") return innerHeight * 0.62;
       return innerHeight * (i % 2 ? 0.4 : 0.52);
     };
 
@@ -157,10 +159,12 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     };
     const startScene = (i: number) => {
       const { wp } = stops[i];
-      if (!wp.scene || wp.scene === "dive") return;
+      if (!wp.scene) return;
       const sceneKey = "scene:" + i;
       if (said.current.has(sceneKey)) return;
       said.current.add(sceneKey);
+      // дайв — сцена без вуали: пометка нужна только воротам
+      if (wp.scene === "dive") return;
       if (wp.scene === "vign1" || wp.scene === "vign2") {
         document
           .querySelector(wp.scene === "vign1" ? ".cg-v1" : ".cg-v2")
@@ -207,8 +211,13 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     };
     // сцены, которые юзер осознанно пробил колесом — ворота их больше не держат
     const skipped = new Set<number>();
+    // передача эстафеты диораме: гид владеет маскотом, джампер ленты ждёт
+    (window as unknown as Record<string, unknown>).__ariyaStripOwned = true;
+    const diveI = WPS.findIndex((wp) => wp.scene === "dive");
+    let inStrip = false;
     const sceneHold = (wp: WpDef) => {
-      if (!wp.scene || wp.scene === "dive") return 0;
+      if (!wp.scene) return 0;
+      if (wp.scene === "dive") return 1500;
       if (wp.scene === "spot") return 1900;
       if (wp.scene === "vign1" || wp.scene === "vign2") return 1500;
       const n = wp.spotSel ? document.querySelectorAll(wp.spotSel).length : 0;
@@ -247,7 +256,6 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
             sp.y > sm.cur + 6 &&
             sp.y <= tgt &&
             sp.wp.scene &&
-            sp.wp.scene !== "dive" &&
             !said.current.has("scene:" + gi) &&
             !skipped.has(gi)
           ) {
@@ -276,6 +284,18 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       sm.lastWrite = sm.cur;
 
       const yq = sm.cur;
+
+      // зона ленты: гид ныряет → джампер запрыгивает; гид уходит → выпрыгивает
+      if (diveI >= 0 && stops[diveI]) {
+        const dist = Math.abs(yq - stops[diveI].y);
+        if (!inStrip && dist < innerHeight * 0.3) {
+          inStrip = true;
+          window.dispatchEvent(new Event("ariya:strip-in"));
+        } else if (inStrip && dist > innerHeight * 0.42) {
+          inStrip = false;
+          window.dispatchEvent(new Event("ariya:strip-out"));
+        }
+      }
       let i = 0;
       while (i < stops.length - 1 && yq >= stops[i + 1].y) i++;
       const a = stops[i];
@@ -300,6 +320,8 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       w.style.transform = `translate3d(${p.x - W / 2}px, ${
         p.y - H / 2
       }px, 0) rotate(${p.r}deg) scale(${p.s})`;
+      // у ленты гид гаснет раньше, чем стал точкой: эстафету принял джампер
+      w.style.opacity = String(clamp((p.s - 0.12) / 0.25, 0, 1));
 
       const arrived =
         tt < 0.18 ? i : tt > 0.82 ? Math.min(i + 1, stops.length - 1) : -1;
@@ -402,6 +424,7 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     return () => {
       cancelAnimationFrame(raf);
       cancelScene();
+      (window as unknown as Record<string, unknown>).__ariyaStripOwned = false;
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("resize", rebuild);
       window.removeEventListener("load", rebuild);
