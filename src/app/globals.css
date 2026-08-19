@@ -632,7 +632,7 @@ html[lang="ru"] .hero h1 {
   overflow: hidden;
 }
 .cs-canvas {
-  height: clamp(210px, 30vw, 300px);
+  height: clamp(250px, 34vw, 400px);
 }
 .cs-canvas canvas {
   display: block;

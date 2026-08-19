@@ -365,7 +365,7 @@ function World() {
       const j = s.i + 1;
       px = lerp(xs[s.i], xs[j], p);
       py = lerp(TOPS[s.i], TOPS[j], p);
-      arc = Math.sin(Math.PI * p) * 1.05;
+      arc = Math.sin(Math.PI * p) * 1.15;
       flare = Math.sin(Math.PI * Math.min(1, p * 1.4));
       if (p >= 1) {
         s.i = j;
@@ -379,7 +379,7 @@ function World() {
       const p = Math.min(1, el / BACK);
       px = lerp(xs[4], xs[0], p);
       py = lerp(TOPS[4], TOPS[0], p);
-      arc = Math.sin(Math.PI * p) * 1.9;
+      arc = Math.sin(Math.PI * p) * 2.1;
       flare = Math.sin(Math.PI * p);
       if (p >= 1) {
         s.i = 0;
@@ -588,7 +588,7 @@ export default function StripScene() {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0.55, 12], fov: 33 }}
+      camera={{ position: [0, 0.55, 14.2], fov: 33 }}
       gl={{ alpha: true, antialias: true }}
       style={{ touchAction: "pan-y" }}
     >
