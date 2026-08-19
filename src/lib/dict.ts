@@ -320,6 +320,8 @@ export const dict = {
         stack: "same stack this site runs on",
         cta: "liked it? hit the button \u2014 we'll build yours",
         sent: "yay! write us \u2014 we reply fast",
+        vign1: "// idea \u2192 product",
+        vign2: "// 4 sprints",
       },
     },
     guide: {
@@ -666,6 +668,8 @@ export const dict = {
         stack: "стек тот же, что у этого сайта",
         cta: "понравилось? жми кнопку — соберём и вам",
         sent: "ура! пиши — отвечаем быстро",
+        vign1: "// идея → продукт",
+        vign2: "// 4 спринта",
       },
     },
     guide: {
