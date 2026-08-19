@@ -573,39 +573,8 @@ html[lang="ru"] .hero h1 {
   margin: 0 auto;
   padding: 110px 24px 90px;
 }
-/* обёртка гида кейса: канвас постоянного размера, пролёт — чистый transform */
-.cg-wrap {
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 40;
-  pointer-events: none;
-  transform-origin: 50% 50%;
-  will-change: transform;
-}
-/* прожектор: вуаль с пятном света; луч — неон от маскота к цели */
-.cg-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: rgba(6, 8, 24, 0.5);
-  opacity: 0;
-  pointer-events: none;
-}
-.cg-beam {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 2px;
-  z-index: 31;
-  background: linear-gradient(90deg, rgba(255, 46, 146, 0.9), rgba(255, 46, 146, 0));
-  transform-origin: 0 50%;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* виньетки-декорации в полях страницы кейса */
-.cg-vign {
+/* декорации в полях страницы кейса: оживают, когда секция въезжает */
+.cd-vign {
   position: absolute;
   left: calc(50% + 440px + 30px);
   width: 150px;
@@ -615,15 +584,15 @@ html[lang="ru"] .hero h1 {
   transition: opacity 0.4s;
   pointer-events: none;
 }
-.cg-vign.alive {
+.cd-vign.alive {
   opacity: 1;
 }
-.cg-vign svg {
+.cd-vign svg {
   display: block;
   width: 100%;
   height: auto;
 }
-.cg-vign span {
+.cd-vign span {
   display: block;
   margin-top: 2px;
   font-family: var(--font-mono);
@@ -631,18 +600,18 @@ html[lang="ru"] .hero h1 {
   color: var(--ink-40);
   text-align: center;
 }
-.cg-vign .vp1,
-.cg-vign .vp2 {
+.cd-vign .vp1,
+.cd-vign .vp2 {
   fill: currentColor;
   opacity: 0.12;
 }
-.cg-vign .vsig {
+.cd-vign .vsig {
   fill: #f0187e;
   animation: vsig 2.2s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
-.cg-vign .vsig2 {
+.cd-vign .vsig2 {
   fill: none;
   stroke: #f0187e;
   stroke-opacity: 0.4;
@@ -654,34 +623,34 @@ html[lang="ru"] .hero h1 {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.18); }
 }
-.cg-vign .varc {
+.cd-vign .varc {
   fill: none;
   stroke: currentColor;
   stroke-opacity: 0.35;
   stroke-width: 2;
   stroke-dasharray: 4 6;
 }
-.cg-vign .varr {
+.cd-vign .varr {
   fill: currentColor;
   opacity: 0.5;
 }
-.cg-vign .vmast {
+.cd-vign .vmast {
   stroke: currentColor;
   stroke-opacity: 0.75;
   stroke-width: 3;
   stroke-linecap: round;
 }
-.cg-vign .vbar,
-.cg-vign .vbase {
+.cd-vign .vbar,
+.cd-vign .vbase {
   stroke: currentColor;
   stroke-opacity: 0.4;
   stroke-width: 2;
   stroke-linecap: round;
 }
-.cg-vign .vtop {
+.cd-vign .vtop {
   fill: #f0187e;
 }
-.cg-vign .vflag {
+.cd-vign .vflag {
   fill: #f0187e;
   transform-box: fill-box;
   transform-origin: left center;
@@ -689,35 +658,16 @@ html[lang="ru"] .hero h1 {
   opacity: 0.5;
   transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1), opacity 0.3s;
 }
-.cg-vign.alive .vf0 .vflag { transition-delay: 0.05s; }
-.cg-vign.alive .vf1 .vflag { transition-delay: 0.2s; }
-.cg-vign.alive .vf2 .vflag { transition-delay: 0.35s; }
-.cg-vign.alive .vf3 .vflag { transition-delay: 0.5s; }
-.cg-vign.alive .vflag {
+.cd-vign.alive .vf0 .vflag { transition-delay: 0.05s; }
+.cd-vign.alive .vf1 .vflag { transition-delay: 0.2s; }
+.cd-vign.alive .vf2 .vflag { transition-delay: 0.35s; }
+.cd-vign.alive .vf3 .vflag { transition-delay: 0.5s; }
+.cd-vign.alive .vflag {
   transform: scale(1);
   opacity: 1;
 }
 @media (max-width: 1159px) {
-  .cg-vign {
-    display: none;
-  }
-}
-
-/* бабл пролёта следует за маскотом; специфичность глушит right/bottom pg */
-.pg-bubble.cg-fly {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: auto;
-  bottom: auto;
-  z-index: 41;
-  pointer-events: auto;
-  transition: opacity 0.3s;
-  will-change: transform, opacity;
-}
-@media (max-width: 899px) {
-  .cg-wrap,
-  .cg-fly {
+  .cd-vign {
     display: none;
   }
 }
