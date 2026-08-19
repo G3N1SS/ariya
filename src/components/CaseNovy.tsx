@@ -6,7 +6,9 @@ import CaseStrip from "./CaseStrip";
 export default function CaseNovy({ locale }: { locale: Locale }) {
   const t = dict[locale].casePage;
   return (
-    <main className="cpage">
+    <main className="cpage cpage-nu">
+      {/* небо игры: ночной градиент, звёзды и конфетти на всю страницу */}
+      <div className="nu-sky" aria-hidden="true" />
       <CaseDecor t={t.decor} />
       <a className="cp-back" href={t.backHref}>
         {t.back}

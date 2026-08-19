@@ -2260,3 +2260,176 @@ html.has-cursor * {
     transition: none;
   }
 }
+
+/* ═══ страница кейса «Новый уровень» в стилистике игры ═══
+   палитра из самой игры: ночное небо, неон-магента, белые платформы.
+   токены переопределяются на body — страница тёмная в обеих темах сайта */
+body:has(.cpage-nu) {
+  --paper: #0a0d26;
+  --paper-2: #131843;
+  --surface: #151b4a;
+  --ink: #eef1ff;
+  --ink-60: rgba(238, 241, 255, 0.68);
+  --ink-40: rgba(238, 241, 255, 0.44);
+  --line: rgba(238, 241, 255, 0.16);
+  --blue: #ff2e92; /* акцент страницы — неон игры */
+  --blue-press: #ff4da5;
+  --fw-ink: rgba(238, 241, 255, 0.14);
+  --fw-blue: rgba(255, 46, 146, 0.5);
+}
+body:has(.cpage-nu) .site-header {
+  background: rgba(8, 10, 30, 0.72);
+}
+/* на неоне читабельнее чернильный текст — как «ЕЩЁ РАЗ» в игре */
+body:has(.cpage-nu) .btn-primary {
+  color: #14071c;
+  box-shadow: 0 0 22px rgba(255, 46, 146, 0.45);
+}
+body:has(.cpage-nu) .btn-primary:hover {
+  box-shadow: 0 0 30px rgba(255, 46, 146, 0.6);
+}
+
+/* ── небо: градиент ночи + два слоя звёзд + конфетти сверху ── */
+.nu-sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #070a1e 0%, #0a0d26 42%, #170f3a 100%);
+}
+.nu-sky::before,
+.nu-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.nu-sky::before {
+  background-image:
+    radial-gradient(1px 1px at 22% 28%, rgba(255, 255, 255, 0.9), transparent 55%),
+    radial-gradient(1.4px 1.4px at 64% 12%, rgba(255, 255, 255, 0.7), transparent 55%),
+    radial-gradient(1px 1px at 83% 42%, rgba(255, 255, 255, 0.8), transparent 55%),
+    radial-gradient(1.2px 1.2px at 41% 64%, rgba(255, 255, 255, 0.55), transparent 55%),
+    radial-gradient(1px 1px at 9% 79%, rgba(255, 255, 255, 0.65), transparent 55%),
+    radial-gradient(1.5px 1.5px at 93% 84%, rgba(255, 255, 255, 0.5), transparent 55%);
+  background-size: 480px 480px;
+  animation: nu-twinkle 5.2s ease-in-out infinite;
+}
+.nu-sky::after {
+  /* конфетти-кристаллы, как в шапке игры — только в верхней трети */
+  background-image:
+    radial-gradient(2px 2px at 15% 12%, rgba(255, 46, 146, 0.9), transparent 60%),
+    radial-gradient(1.8px 1.8px at 48% 7%, rgba(255, 214, 90, 0.85), transparent 60%),
+    radial-gradient(2px 2px at 76% 16%, rgba(96, 205, 255, 0.85), transparent 60%),
+    radial-gradient(1.6px 1.6px at 32% 22%, rgba(140, 255, 170, 0.8), transparent 60%),
+    radial-gradient(2.2px 2.2px at 90% 6%, rgba(255, 46, 146, 0.8), transparent 60%);
+  background-size: 560px 560px;
+  mask: linear-gradient(180deg, #000 0%, transparent 34%);
+  animation: nu-twinkle 4.1s ease-in-out infinite reverse;
+}
+@keyframes nu-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* ── HUD-детали: тег кейса как игровая панель, клиент — mono лавандой ── */
+.cpage-nu .cp-tag {
+  background: #10163e;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 5px 11px;
+  color: #fff;
+}
+.cpage-nu .cp-tag::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff2e92;
+  box-shadow: 0 0 8px rgba(255, 46, 146, 0.9);
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+.cpage-nu .cp-client {
+  color: #8d93c4;
+}
+
+/* ── платформа с игроком под каждым заголовком секции ── */
+.cpage-nu .cp-sec h2 {
+  position: relative;
+  padding-bottom: 22px;
+}
+.cpage-nu .cp-sec h2::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: 0;
+  width: 68px;
+  height: 9px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.22);
+}
+.cpage-nu .cp-sec h2::after {
+  content: "";
+  position: absolute;
+  left: 52px;
+  bottom: 10px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ff2e92;
+  box-shadow: 0 0 12px rgba(255, 46, 146, 0.95), 0 0 30px rgba(255, 46, 146, 0.4);
+  animation: nu-hop 2.4s cubic-bezier(0.35, 0, 0.3, 1) infinite;
+}
+@keyframes nu-hop {
+  0%, 100% { transform: translateY(0); }
+  16% { transform: translateY(-7px); }
+  32% { transform: translateY(0); }
+}
+
+/* ── кадры: неоновая кромка, подсветка на ховере ── */
+.cpage-nu .cp-shots img,
+.cpage-nu .cp-eras img {
+  border-color: rgba(255, 46, 146, 0.3);
+  box-shadow: 0 18px 48px rgba(5, 6, 20, 0.6);
+  transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.3s;
+}
+.cpage-nu .cp-shots figure:hover img,
+.cpage-nu .cp-eras figure:hover img {
+  transform: translateY(-5px);
+  box-shadow: 0 24px 54px rgba(5, 6, 20, 0.65), 0 0 26px rgba(255, 46, 146, 0.28);
+}
+.cpage-nu .cp-shots figcaption,
+.cpage-nu .cp-eras figcaption {
+  color: #8d93c4;
+}
+
+/* лента-диорама сливается с небом страницы — мир один */
+.cpage-nu .case-strip {
+  background: transparent;
+}
+
+/* ── стек: тёмные капсулы, CTA: карточка финала как в игре ── */
+.cpage-nu .cl-stack i {
+  background: #10163e;
+  border-color: var(--line);
+  color: var(--ink-60);
+}
+.cpage-nu .cp-cta {
+  background: #10163e;
+  border-color: rgba(255, 46, 146, 0.45);
+  box-shadow: 0 0 0 1px rgba(255, 46, 146, 0.12), 0 24px 70px rgba(5, 6, 20, 0.55),
+    inset 0 0 40px rgba(255, 46, 146, 0.05);
+}
+.cpage-nu .cp-cta b {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nu-sky::before,
+  .nu-sky::after,
+  .cpage-nu .cp-sec h2::after {
+    animation: none;
+  }
+}
