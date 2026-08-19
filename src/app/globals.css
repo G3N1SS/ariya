@@ -459,13 +459,15 @@ html[lang="ru"] .hero h1 {
 .case-live {
   padding: clamp(24px, 4vw, 48px);
   padding-bottom: 88px;
+  /* высоту держит лента кадров, а не пустой воздух под ней */
+  min-height: clamp(300px, 46vh, 500px);
 }
 .cl-grid {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(20px, 3.5vw, 48px);
+  grid-template-columns: 1fr 1.22fr;
+  gap: clamp(20px, 3vw, 40px);
   align-items: center;
   width: 100%;
 }
@@ -507,27 +509,60 @@ html[lang="ru"] .hero h1 {
 .cl-btn {
   margin-top: 20px;
 }
-.cl-shot {
+/* лента эпох: три кадра колонками, средний крупнее и приподнят */
+.cl-strip {
+  display: grid;
+  grid-template-columns: 1fr 1.16fr 1fr;
+  align-items: end;
+  gap: clamp(8px, 1.2vw, 14px);
   cursor: pointer;
 }
-.cl-shot {
+.cl-strip figure {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
 }
-.cl-shot img {
-  width: auto;
-  max-width: 100%;
-  max-height: clamp(320px, 42vh, 440px);
-  border-radius: 22px;
+.cl-strip figure:nth-child(2) {
+  transform: translateY(-14px);
+}
+.cl-strip img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
   border: 1px solid var(--line);
-  box-shadow: 0 26px 60px rgba(13, 16, 51, 0.2);
+  box-shadow: 0 16px 36px rgba(13, 16, 51, 0.18);
+  transition: transform 0.35s cubic-bezier(0.2, 1, 0.3, 1);
+}
+.cl-strip figcaption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-40);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cl-strip:hover figure:nth-child(1) img {
+  transform: translateY(-4px) rotate(-1.2deg);
+}
+.cl-strip:hover figure:nth-child(2) img {
+  transform: translateY(-7px);
+}
+.cl-strip:hover figure:nth-child(3) img {
+  transform: translateY(-4px) rotate(1.2deg);
 }
 @media (max-width: 860px) {
   .cl-grid {
     grid-template-columns: 1fr;
   }
-  .cl-shot img {
-    max-height: 340px;
+  .cl-strip {
+    max-width: 460px;
+  }
+  /* на узком штамп в углу иначе ложится на подписи ленты,
+     а абсолютный тег «// case-01» — на строку клиента */
+  .case-live {
+    padding-top: 52px;
+    padding-bottom: 116px;
   }
 }
 

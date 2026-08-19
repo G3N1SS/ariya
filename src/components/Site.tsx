@@ -172,14 +172,20 @@ export default function Site({ locale }: { locale: Locale }) {
                     </a>
                   </div>
                 </div>
-                <a className="cl-shot" href={c.pageHref} aria-label={c.title}>
-                  <img
-                    src={c.img}
-                    alt={c.alt}
-                    width={500}
-                    height={693}
-                    loading="lazy"
-                  />
+                {/* лента эпох: прогрессия кадров как мини-история кейса */}
+                <a className="cl-strip" href={c.pageHref} aria-label={c.title}>
+                  {c.strip.map((sh) => (
+                    <figure key={sh.img}>
+                      <img
+                        src={sh.img}
+                        alt={sh.alt}
+                        width={500}
+                        height={693}
+                        loading="lazy"
+                      />
+                      <figcaption>{`// ${sh.cap}`}</figcaption>
+                    </figure>
+                  ))}
                 </a>
               </div>
               <div className="stamp">

@@ -93,6 +93,24 @@ export const dict = {
           pageLabel: "case study \u2192",
           img: "/cases/novy-uroven.png",
           alt: "Novy Uroven gameplay: the signal character jumps across cell towers",
+          // лента эпох на постере: прогрессия сетей как мини-история
+          strip: [
+            {
+              img: "/cases/novy-uroven-3g.png",
+              cap: "3G",
+              alt: "Novy Uroven: the 3G era, low towers over the city",
+            },
+            {
+              img: "/cases/novy-uroven.png",
+              cap: "gameplay",
+              alt: "Novy Uroven gameplay: the signal character jumps across cell towers",
+            },
+            {
+              img: "/cases/novy-uroven-6g.png",
+              cap: "6G · finale",
+              alt: "Novy Uroven: the 6G era, the future banner in orbit",
+            },
+          ],
         },
       ],
       placeholderTitle: "Case materials are on the way",
@@ -307,7 +325,7 @@ export const dict = {
     guide: {
       hello: "hey! I live here. click me — or press ⌘K",
       services: "everything here is buyable — and it actually runs",
-      work: "cases are on their way. the layout is ready, as you can see",
+      work: "first one's live — open it, I'll walk you through",
       process: "estimate in 1–2 days. I keep an eye on these three",
       contact: "two sentences is enough — the form flies straight to our telegram",
       sent: "got it! the team is already reading. I checked",
@@ -421,6 +439,24 @@ export const dict = {
           pageLabel: "подробнее \u2192",
           img: "/cases/novy-uroven.png",
           alt: "Геймплей «Нового уровня»: сигнал прыгает по вышкам связи",
+          // лента эпох на постере: прогрессия сетей как мини-история
+          strip: [
+            {
+              img: "/cases/novy-uroven-3g.png",
+              cap: "3G",
+              alt: "«Новый уровень»: эпоха 3G, низкие вышки над городом",
+            },
+            {
+              img: "/cases/novy-uroven.png",
+              cap: "геймплей",
+              alt: "Геймплей «Нового уровня»: сигнал прыгает по вышкам связи",
+            },
+            {
+              img: "/cases/novy-uroven-6g.png",
+              cap: "6G · финал",
+              alt: "«Новый уровень»: эпоха 6G, баннер будущего на орбите",
+            },
+          ],
         },
       ],
       placeholderTitle: "Материалы кейса в пути",
@@ -635,7 +671,7 @@ export const dict = {
     guide: {
       hello: "привет! я тут живу. тыкни меня — или жми ⌘K",
       services: "всё, что здесь, можно купить — и оно правда работает",
-      work: "кейсы уже в пути. вёрстка готова, сам видишь",
+      work: "первый кейс живой — открой, я там всё расскажу",
       process: "оценка за 1–2 дня. я слежу за этими тремя",
       contact: "двух предложений хватит — форма летит прямо к нам в телеграм",
       sent: "заявка у нас! команда уже читает. я проверила",
