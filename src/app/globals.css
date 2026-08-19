@@ -538,52 +538,31 @@ html[lang="ru"] .hero h1 {
   margin: 0 auto;
   padding: 110px 24px 90px;
 }
-/* якорь большого Призмы в шапке кейса: гид стартует из этого бокса */
-.cp-pr-anchor {
-  position: absolute;
-  top: 92px;
-  right: 10px;
-  width: clamp(190px, 23vw, 258px);
-  aspect-ratio: 0.93;
-  pointer-events: none;
-}
-/* обёртка гида кейса: канвас постоянного размера, сжатие — чистый transform */
+/* обёртка гида кейса: канвас постоянного размера, пролёт — чистый transform */
 .cg-wrap {
   position: fixed;
   left: 0;
   top: 0;
   z-index: 40;
   pointer-events: none;
-  transform-origin: 0 0;
+  transform-origin: 50% 50%;
   will-change: transform;
 }
-/* специфичность выше .pg-bubble: его right/bottom здесь должны молчать */
-.pg-bubble.cg-greet {
+/* бабл пролёта следует за маскотом; специфичность глушит right/bottom pg */
+.pg-bubble.cg-fly {
   position: fixed;
   left: 0;
   top: 0;
   right: auto;
   bottom: auto;
   z-index: 41;
-  pointer-events: none;
-  border-radius: 14px 4px 14px 14px;
-  transition: opacity 0.35s;
-  will-change: transform, opacity;
-}
-.pg-bubble.cg-bub {
-  position: fixed;
-  right: 132px;
-  bottom: 150px;
-  left: auto;
-  top: auto;
   pointer-events: auto;
-  z-index: 41;
+  transition: opacity 0.3s;
+  will-change: transform, opacity;
 }
 @media (max-width: 899px) {
   .cg-wrap,
-  .cg-greet,
-  .cg-bub,
-  .cp-pr-anchor {
+  .cg-fly {
     display: none;
   }
 }

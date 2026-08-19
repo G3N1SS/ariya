@@ -20,24 +20,41 @@ export type CaseGuideT = {
 };
 
 const BUBBLE_MS = 4600;
-// за столько пикселей скролла большой Призма из шапки сжимается в угол
-const SHRINK_D = 340;
-// угловой размер — как у гида на главной (.pg-wrap)
-const CORNER_W = 195;
 const smooth = (x: number) => x * x * (3 - 2 * x);
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-// механика №8+№1: встречает большим в шапке кейса → сжимается в угол-гид →
-// комментирует секции; антенна скина качает эпохи по мере скролла галереи
+// пролёт по кейсу, как у логотипа на главной: мизансцены-вейпоинты у секций,
+// маскот скользит между ними по скроллу и, паркуясь, объясняет что да как;
+// у ленты-диорамы ныряет в неё (сжимается в точку — там его ждёт джампер)
+type WpDef = {
+  sel: string | null;
+  side: "l" | "r" | "c";
+  s: number;
+  key: keyof CaseGuideT | null;
+  frac: number; // на какой доле вьюпорта секция, когда маскот припаркован
+};
+const WPS: WpDef[] = [
+  { sel: null, side: "r", s: 1, key: "greet", frac: 0 },
+  { sel: '[data-cg="shots"]', side: "l", s: 0.6, key: "shots", frac: 0.3 },
+  { sel: '[data-cg="task"]', side: "r", s: 0.62, key: "task", frac: 0.34 },
+  { sel: '[data-cg="built"]', side: "l", s: 0.6, key: "built", frac: 0.3 },
+  { sel: '[data-cg="flow"]', side: "r", s: 0.62, key: "flow", frac: 0.32 },
+  { sel: ".case-strip", side: "c", s: 0.03, key: null, frac: 0.46 },
+  { sel: '[data-cg="eras"]', side: "r", s: 0.62, key: "eras", frac: 0.3 },
+  { sel: '[data-cg="stack"]', side: "l", s: 0.6, key: "stack", frac: 0.36 },
+  { sel: '[data-cg="cta"]', side: "r", s: 0.66, key: "cta", frac: 0.52 },
+];
+
 export default function CaseGuide({ t }: { t: CaseGuideT }) {
   const [mounted, setMounted] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
-  const greet = useRef<HTMLDivElement>(null);
-  const hero = useRef({ left: 0, top: 0, w: 260, h: 280 });
-  const prog = useRef(0);
+  const bub = useRef<HTMLDivElement>(null);
   const lastLvl = useRef(-1);
   const timer = useRef(0);
   const said = useRef(new Set<string>());
+  const pose = useRef({ x: 0, y: 0, s: 1, r: 0, side: "r" as "l" | "r" | "c" });
 
   // гид — десктопная роскошь, как и на главной
   useEffect(() => {
@@ -48,8 +65,6 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
   }, []);
 
   const say = (key: string, text: string, once = true) => {
-    // пока Призма большая в шапке, угловым репликам рано
-    if (prog.current < 0.6) return;
     if (once && said.current.has(key)) return;
     said.current.add(key);
     setBubble(text);
@@ -59,133 +74,168 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
 
   useEffect(() => {
     if (!mounted) return;
-    const anchor = document.querySelector<HTMLElement>(".cp-pr-anchor");
-    const erasEl = document.querySelector<HTMLElement>(".cp-eras");
+    let W = clamp(innerWidth * 0.23, 190, 258);
+    let H = W / 0.93;
+    const w = wrap.current;
+    if (w) {
+      w.style.width = W + "px";
+      w.style.height = H + "px";
+    }
 
-    const place = () => {
-      const w = wrap.current;
-      if (!w) return;
-      const hr = hero.current;
-      const p = Math.min(1, Math.max(0, scrollY / SHRINK_D));
-      prog.current = p;
-      const e = smooth(p);
-      const sCorner = CORNER_W / hr.w;
-      const tx = hr.left + (innerWidth - CORNER_W - hr.left) * e;
-      const heroTop = hr.top - scrollY;
-      const cornerTop = innerHeight - hr.h * sCorner;
-      const ty = heroTop + (cornerTop - heroTop) * e;
-      const s = 1 + (sCorner - 1) * e;
-      w.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${s})`;
+    // стопы вейпоинтов в координатах скролла
+    let stops: { y: number; wp: WpDef; el: HTMLElement | null }[] = [];
+    const build = () => {
+      W = clamp(innerWidth * 0.23, 190, 258);
+      H = W / 0.93;
+      if (w) {
+        w.style.width = W + "px";
+        w.style.height = H + "px";
+      }
+      const maxY = document.documentElement.scrollHeight - innerHeight;
+      stops = WPS.map((wp) => {
+        let y = 0;
+        const el = wp.sel
+          ? document.querySelector<HTMLElement>(wp.sel)
+          : null;
+        if (el) {
+          const r = el.getBoundingClientRect();
+          y = clamp(r.top + scrollY - innerHeight * wp.frac, 0, maxY);
+        }
+        return { y, wp, el };
+      });
+      // хвост у конца страницы слипается на maxY (CTA-поза недостижима) —
+      // разносим назад с минимальным зазором, затем чиним строгий рост
+      const gap = innerHeight * 0.2;
+      for (let i = stops.length - 2; i >= 0; i--)
+        stops[i].y = Math.min(stops[i].y, stops[i + 1].y - gap);
+      let prev = -1;
+      for (const sp of stops) {
+        sp.y = Math.max(sp.y, prev + 1, 0);
+        prev = sp.y;
+      }
+    };
 
-      // приветствие живёт слева от большого Призмы и гаснет на сжатии
-      const g = greet.current;
-      if (g) {
-        g.style.transform = `translate3d(${hr.left - 12}px, ${
-          heroTop + hr.h * 0.22
-        }px, 0) translateX(-100%)`;
-        g.style.opacity = p < 0.18 ? "1" : "0";
+    // экранная точка парковки: у краёв колонки, на широких — в полях
+    const parkX = (side: "l" | "r" | "c", s: number) => {
+      if (side === "c") return innerWidth / 2;
+      const margin = Math.max(0, (innerWidth - 880) / 2);
+      const lx = Math.max((W * s) / 2 + 14, margin * 0.55 + 40);
+      return side === "l" ? lx : innerWidth - lx;
+    };
+    const parkY = (i: number) => {
+      // герой встречает у заголовка, остальные — на своей доле вьюпорта
+      if (i === 0) return innerHeight * 0.36;
+      return innerHeight * (0.42 + (i % 2) * 0.05);
+    };
+
+    let lastArrived = -1;
+    let raf = 0;
+    let lastT = performance.now();
+    const tick = (now: number) => {
+      raf = requestAnimationFrame(tick);
+      const dt = Math.min(0.05, (now - lastT) / 1000);
+      lastT = now;
+      if (!stops.length || !w) return;
+
+      // сегмент скролла → целевая мизансцена
+      const yq = scrollY;
+      let i = 0;
+      while (i < stops.length - 1 && yq >= stops[i + 1].y) i++;
+      const a = stops[i];
+      const b = stops[Math.min(i + 1, stops.length - 1)];
+      const span = Math.max(1, b.y - a.y);
+      const tt = a === b ? 0 : smooth(clamp((yq - a.y) / span, 0, 1));
+
+      const ax = parkX(a.wp.side, a.wp.s);
+      const bx = parkX(b.wp.side, b.wp.s);
+      const tx = lerp(ax, bx, tt);
+      const ty = lerp(parkY(i), parkY(Math.min(i + 1, stops.length - 1)), tt);
+      const ts = lerp(a.wp.s, b.wp.s, tt);
+
+      // плавность и крен по горизонтальной скорости — «полёт», не телепорт
+      const k = 1 - Math.pow(0.002, dt);
+      const p = pose.current;
+      p.x = lerp(p.x, tx, k);
+      p.y = lerp(p.y, ty, k);
+      p.s = lerp(p.s, ts, k);
+      p.r = lerp(p.r, clamp((tx - p.x) * 0.06, -16, 16), k);
+      p.side = tt < 0.5 ? a.wp.side : b.wp.side;
+      w.style.transform = `translate3d(${p.x - W / 2}px, ${
+        p.y - H / 2
+      }px, 0) rotate(${p.r}deg) scale(${p.s})`;
+
+      // реплика мизансцены — при прибытии (и пока не нырнул в ленту)
+      const arrived = tt < 0.18 ? i : tt > 0.82 ? Math.min(i + 1, stops.length - 1) : -1;
+      if (arrived !== -1 && arrived !== lastArrived) {
+        lastArrived = arrived;
+        const key = stops[arrived].wp.key;
+        if (key) say(key, t[key]);
+      }
+      if (p.s < 0.15) setBubble(null);
+
+      // бабл летит рядом с маскотом, со стороны свободного края
+      const bb = bub.current;
+      if (bb) {
+        const half = (W * p.s) / 2;
+        const by = p.y - (H * p.s) * 0.42;
+        if (p.side === "l") {
+          bb.style.transform = `translate3d(${p.x + half + 14}px, ${by}px, 0)`;
+          bb.style.borderRadius = "4px 14px 14px 14px";
+        } else {
+          bb.style.transform = `translate3d(${
+            p.x - half - 14
+          }px, ${by}px, 0) translateX(-100%)`;
+          bb.style.borderRadius = "14px 4px 14px 14px";
+        }
+        bb.style.opacity = p.s < 0.15 ? "0" : "1";
       }
 
       // антенна эпох: 3G → 6G по прогрессу скролла через секцию «Эпохи»
-      if (erasEl) {
-        const r = erasEl.getBoundingClientRect();
+      const eras = stops.find((sp) => sp.wp.key === "eras")?.el;
+      if (eras) {
+        const r = eras.getBoundingClientRect();
         const ep = (innerHeight * 0.78 - r.top) / (r.height || 1);
         const lvl = Math.max(0, Math.min(3, Math.floor(ep * 4)));
         if (lvl !== lastLvl.current) {
           lastLvl.current = lvl;
-          window.dispatchEvent(
-            new CustomEvent("ariya:antenna", { detail: lvl })
-          );
+          window.dispatchEvent(new CustomEvent("ariya:antenna", { detail: lvl }));
         }
       }
     };
 
-    const measure = () => {
-      if (!anchor) return;
-      const r = anchor.getBoundingClientRect();
-      hero.current = {
-        left: r.left + scrollX,
-        top: r.top + scrollY,
-        w: r.width,
-        h: r.height,
-      };
-      const w = wrap.current;
-      if (w) {
-        w.style.width = r.width + "px";
-        w.style.height = r.height + "px";
-      }
-      place();
+    build();
+    // стартуем из позы героя без пролёта через весь экран
+    pose.current = {
+      x: parkX("r", 1),
+      y: innerHeight * 0.36,
+      s: 1,
+      r: 0,
+      side: "r",
     };
+    raf = requestAnimationFrame(tick);
+    const rebuild = () => build();
+    window.addEventListener("resize", rebuild);
+    window.addEventListener("load", rebuild);
+    const settle = window.setTimeout(rebuild, 1600);
 
-    measure();
-    window.addEventListener("scroll", place, { passive: true });
-    window.addEventListener("resize", measure);
-    window.addEventListener("load", measure);
-
-    // реплики по секциям — по одной на визит
-    const keys: (keyof CaseGuideT)[] = [
-      "shots",
-      "task",
-      "built",
-      "flow",
-      "eras",
-      "stack",
-      "cta",
-    ];
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const en of entries) {
-          if (!en.isIntersecting) continue;
-          const key = (en.target as HTMLElement).dataset.cg as
-            | keyof CaseGuideT
-            | undefined;
-          if (key) say(key, t[key]);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    document.querySelectorAll("[data-cg]").forEach((el) => io.observe(el));
-
-    // клик по кнопке CTA — праздник, как отправка заявки на главной
+    // клик по кнопке CTA — праздник; «поиграть» — сальто (идея №3 с доски)
     const cta = document.querySelector<HTMLElement>(".cp-cta .btn");
     const onCta = () => {
       window.dispatchEvent(new CustomEvent("ariya:emotion", { detail: "happy" }));
       say("sent", t.sent, false);
     };
     cta?.addEventListener("click", onCta);
-
-    // клик «поиграть» в шапке — сальто большого Призмы (идея №3 с доски)
     const play = document.querySelector<HTMLElement>(".cpage > .btn-primary");
     const onPlay = () =>
       window.dispatchEvent(new CustomEvent("ariya:emotion", { detail: "spin" }));
     play?.addEventListener("click", onPlay);
 
-    // пока лента-диорама на экране, угловой гид прячется: Призма «в сцене»
-    let stripIo: IntersectionObserver | undefined;
-    const strip = document.querySelector(".case-strip");
-    if (strip) {
-      stripIo = new IntersectionObserver(
-        (en) => {
-          const on = en.some((e) => e.isIntersecting);
-          const w = wrap.current;
-          if (w) {
-            w.style.opacity = on ? "0" : "1";
-            w.style.transition = "opacity 0.4s";
-          }
-          if (on) setBubble(null);
-        },
-        { threshold: 0.25 }
-      );
-      stripIo.observe(strip);
-    }
-
     return () => {
-      window.removeEventListener("scroll", place);
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("load", measure);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", rebuild);
+      window.removeEventListener("load", rebuild);
+      window.clearTimeout(settle);
       window.clearTimeout(timer.current);
-      io.disconnect();
-      stripIo?.disconnect();
       cta?.removeEventListener("click", onCta);
       play?.removeEventListener("click", onPlay);
     };
@@ -196,10 +246,6 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
 
   return (
     <>
-      <div className="cg-greet pg-bubble" ref={greet} aria-hidden="true">
-        <span className="t">{"// prisma"}</span>
-        {t.greet}
-      </div>
       <div className="cg-wrap" ref={wrap} aria-hidden="true">
         <div className="pg-canvas">
           <PrismaScene mode="guide" skin="nu" />
@@ -207,7 +253,8 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
       </div>
       {bubble && (
         <div
-          className="pg-bubble cg-bub"
+          className="pg-bubble cg-fly"
+          ref={bub}
           aria-hidden="true"
           onClick={() => setBubble(null)}
         >

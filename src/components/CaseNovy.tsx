@@ -7,8 +7,6 @@ export default function CaseNovy({ locale }: { locale: Locale }) {
   const t = dict[locale].casePage;
   return (
     <main className="cpage">
-      {/* якорь большого Призмы в шапке: гид меряет его и стартует отсюда */}
-      <div className="cp-pr-anchor" aria-hidden="true" />
       <CaseGuide t={t.guide} />
       <a className="cp-back" href={t.backHref}>
         {t.back}
