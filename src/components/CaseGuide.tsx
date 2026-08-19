@@ -36,19 +36,20 @@ type WpDef = {
 };
 const WPS: WpDef[] = [
   { sel: null, side: "r", s: 1, key: "greet", frac: 0 },
-  { sel: '[data-cg="shots"]', side: "l", s: 0.6, key: "shots", frac: 0.3 },
-  { sel: '[data-cg="task"]', side: "r", s: 0.62, key: "task", frac: 0.34 },
-  { sel: '[data-cg="built"]', side: "l", s: 0.6, key: "built", frac: 0.3 },
-  { sel: '[data-cg="flow"]', side: "r", s: 0.62, key: "flow", frac: 0.32 },
+  { sel: '[data-cg="shots"]', side: "l", s: 0.74, key: "shots", frac: 0.3 },
+  { sel: '[data-cg="task"]', side: "r", s: 0.76, key: "task", frac: 0.34 },
+  { sel: '[data-cg="built"]', side: "l", s: 0.74, key: "built", frac: 0.3 },
+  { sel: '[data-cg="flow"]', side: "r", s: 0.76, key: "flow", frac: 0.32 },
   { sel: ".case-strip", side: "c", s: 0.03, key: null, frac: 0.46 },
-  { sel: '[data-cg="eras"]', side: "r", s: 0.62, key: "eras", frac: 0.3 },
-  { sel: '[data-cg="stack"]', side: "l", s: 0.6, key: "stack", frac: 0.36 },
-  { sel: '[data-cg="cta"]', side: "r", s: 0.66, key: "cta", frac: 0.52 },
+  { sel: '[data-cg="eras"]', side: "r", s: 0.76, key: "eras", frac: 0.3 },
+  { sel: '[data-cg="stack"]', side: "l", s: 0.74, key: "stack", frac: 0.36 },
+  { sel: '[data-cg="cta"]', side: "r", s: 0.72, key: "cta", frac: 0.52 },
 ];
 
 export default function CaseGuide({ t }: { t: CaseGuideT }) {
   const [mounted, setMounted] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
+  const bubText = useRef<string | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const bub = useRef<HTMLDivElement>(null);
   const lastLvl = useRef(-1);
@@ -67,14 +68,18 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
   const say = (key: string, text: string, once = true) => {
     if (once && said.current.has(key)) return;
     said.current.add(key);
+    bubText.current = text;
     setBubble(text);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setBubble(null), BUBBLE_MS);
+    timer.current = window.setTimeout(() => {
+      bubText.current = null;
+      setBubble(null);
+    }, BUBBLE_MS);
   };
 
   useEffect(() => {
     if (!mounted) return;
-    let W = clamp(innerWidth * 0.23, 190, 258);
+    let W = clamp(innerWidth * 0.25, 214, 296);
     let H = W / 0.93;
     const w = wrap.current;
     if (w) {
@@ -85,7 +90,7 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
     // стопы вейпоинтов в координатах скролла
     let stops: { y: number; wp: WpDef; el: HTMLElement | null }[] = [];
     const build = () => {
-      W = clamp(innerWidth * 0.23, 190, 258);
+      W = clamp(innerWidth * 0.25, 214, 296);
       H = W / 0.93;
       if (w) {
         w.style.width = W + "px";
@@ -171,23 +176,31 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
         const key = stops[arrived].wp.key;
         if (key) say(key, t[key]);
       }
-      if (p.s < 0.15) setBubble(null);
+      // нырнул в ленту — реплика гаснет
+      if (p.s < 0.15 && bubText.current) {
+        bubText.current = null;
+        setBubble(null);
+      }
 
-      // бабл летит рядом с маскотом, со стороны свободного края
+      // бабл летит рядом с маскотом СО СТОРОНЫ СВОБОДНОГО КРАЯ: маскот слева —
+      // окно справа от него, маскот справа — слева; хвостик всегда к маскоту.
+      // позиция обновляется каждый кадр ещё ДО появления текста — без мигания в (0,0)
       const bb = bub.current;
       if (bb) {
         const half = (W * p.s) / 2;
         const by = p.y - (H * p.s) * 0.42;
         if (p.side === "l") {
-          bb.style.transform = `translate3d(${p.x + half + 14}px, ${by}px, 0)`;
+          bb.style.transform = `translate3d(${p.x + half + 16}px, ${by}px, 0)`;
           bb.style.borderRadius = "4px 14px 14px 14px";
         } else {
           bb.style.transform = `translate3d(${
-            p.x - half - 14
+            p.x - half - 16
           }px, ${by}px, 0) translateX(-100%)`;
           bb.style.borderRadius = "14px 4px 14px 14px";
         }
-        bb.style.opacity = p.s < 0.15 ? "0" : "1";
+        const vis = !!bubText.current && p.s >= 0.15;
+        bb.style.opacity = vis ? "1" : "0";
+        bb.style.pointerEvents = vis ? "auto" : "none";
       }
 
       // антенна эпох: 3G → 6G по прогрессу скролла через секцию «Эпохи»
@@ -251,17 +264,19 @@ export default function CaseGuide({ t }: { t: CaseGuideT }) {
           <PrismaScene mode="guide" skin="nu" />
         </div>
       </div>
-      {bubble && (
-        <div
-          className="pg-bubble cg-fly"
-          ref={bub}
-          aria-hidden="true"
-          onClick={() => setBubble(null)}
-        >
-          <span className="t">{"// prisma"}</span>
-          {bubble}
-        </div>
-      )}
+      <div
+        className="pg-bubble cg-fly"
+        ref={bub}
+        aria-hidden="true"
+        style={{ opacity: 0, pointerEvents: "none" }}
+        onClick={() => {
+          bubText.current = null;
+          setBubble(null);
+        }}
+      >
+        <span className="t">{"// prisma"}</span>
+        {bubble}
+      </div>
     </>
   );
 }
