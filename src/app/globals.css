@@ -2873,9 +2873,9 @@ body:has(.cpage-nk) .btn-primary {
 }
 .nk-wm-bg {
   position: absolute;
-  right: -60px;
+  left: 50%;
   top: 54%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   width: min(560px, 72%);
   height: auto;
   color: rgba(200, 169, 106, 0.12);
