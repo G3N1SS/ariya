@@ -82,6 +82,19 @@ export default function CaseKovcheg({ locale }: { locale: Locale }) {
         </div>
       </section>
 
+      <section className="cp-sec">
+        <h2>{t.stagesH}</h2>
+        <div className="cpk-stages">
+          {t.stages.map((st) => (
+            <div className={`cpk-stage${st.live ? " is-live" : ""}`} key={st.name}>
+              <span className="st">{st.st}</span>
+              <b>{st.name}</b>
+              <p>{st.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="cp-cta">
         <b>{t.ctaH}</b>
         <a
@@ -94,7 +107,6 @@ export default function CaseKovcheg({ locale }: { locale: Locale }) {
           {t.ctaBtn}
         </a>
       </section>
-      <p className="cpk-note">{t.note}</p>
     </main>
   );
 }

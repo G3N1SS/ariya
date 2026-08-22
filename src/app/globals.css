@@ -2528,14 +2528,58 @@ body:has(.cpage-nk) .btn-primary {
   border-color: rgba(200, 169, 106, 0.6);
   box-shadow: 0 24px 60px rgba(23, 19, 16, 0.12);
 }
-.cpk-note {
-  margin-top: 18px;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  color: var(--ink-40);
-}
 @media (max-width: 720px) {
   .cpk-more {
     grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* дорожная карта кейса ковчега: два этапа, live подсвечен шампанью */
+.cpk-stages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 2vw, 20px);
+  margin-top: 22px;
+}
+.cpk-stage {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+.cpk-stage.is-live {
+  border-color: rgba(200, 169, 106, 0.65);
+  background: #efe8db;
+  box-shadow: 0 14px 34px rgba(23, 19, 16, 0.1);
+}
+.cpk-stage .st {
+  display: inline-block;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-bottom: 12px;
+}
+.cpk-stage.is-live .st {
+  color: #171310;
+  background: #c8a96a;
+  border-color: #c8a96a;
+}
+.cpk-stage b {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+.cpk-stage p {
+  font-size: 14.5px;
+  color: var(--ink-60);
+}
+@media (max-width: 640px) {
+  .cpk-stages {
+    grid-template-columns: 1fr;
   }
 }

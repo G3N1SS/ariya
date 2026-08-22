@@ -117,7 +117,7 @@ export const dict = {
           tag: "case-02",
           client: "Novy Kovcheg · banquet house",
           title: "Novy Kovcheg",
-          text: "A landing page for a banquet house in Kimovsk: four halls, three menu packages and a booking form in one warm serif journey. Astro static output with GSAP choreography — flies on the guests' phones.",
+          text: "The full digital storefront for a banquet house in Kimovsk. Stage one is live: four halls, three menus and a booking form in one warm serif journey. Stage two — a banquet delivery e-shop — is in the works.",
           stack: ["Astro 5", "TypeScript", "GSAP", "Lenis"],
           link: "https://noviykovcheg.ru",
           linkLabel: "visit site",
@@ -144,8 +144,8 @@ export const dict = {
           ],
         },
       ],
-      placeholderTitle: "Delivery e-shop — in the works",
-      placeholderNote: "Banquet dishes to order for Novy Kovcheg. The case lands here after launch.",
+      placeholderTitle: "Open slot",
+      placeholderNote: "The next case could be your project — message us.",
       stampSoon: "soon",
       closing:
         "Want the same breakdown for your idea? Message us — we’ll show you what’s possible.",
@@ -360,7 +360,7 @@ export const dict = {
       tag: "// case-02",
       client: "Novy Kovcheg \u00b7 banquet house, Kimovsk",
       title: "Novy Kovcheg",
-      lead: "A banquet house with four halls needed a site that sells the atmosphere and brings bookings. We built a warm serif landing from scratch \u2014 our own design system, staged photography, a booking form that lands straight in the owner's Telegram.",
+      lead: "We are building the venue's whole digital presence. Stage one \u2014 a warm serif landing that sells the atmosphere of four halls and brings bookings straight to the owner's Telegram. Stage two, a banquet delivery e-shop, is already in the works on the same design system.",
       play: "visit the site",
       link: "https://noviykovcheg.ru",
       shots: [
@@ -396,7 +396,21 @@ export const dict = {
       stack: ["Astro 5", "TypeScript", "GSAP", "Lenis", "Sharp", "PHP \u2192 Telegram"],
       ctaH: "Want a site that sells the atmosphere?",
       ctaBtn: "discuss in Telegram",
-      note: "// next for this client: a banquet delivery e-shop \u2014 already in the works",
+      stagesH: "Roadmap",
+      stages: [
+        {
+          st: "stage 01 \u00b7 live",
+          live: true,
+          name: "Landing with booking",
+          text: "Four halls, menus, FAQ and a lead form \u2014 the venue's digital front door.",
+        },
+        {
+          st: "stage 02 \u00b7 in the works",
+          live: false,
+          name: "Delivery e-shop",
+          text: "Banquet dishes to order online \u2014 same design system, one seamless brand.",
+        },
+      ],
     },
     ck: {
       aria: "Command palette",
@@ -531,7 +545,7 @@ export const dict = {
           tag: "case-02",
           client: "Новый Ковчег · дом торжеств",
           title: "Новый Ковчег",
-          text: "Лендинг дома торжеств в Кимовске: четыре зала, три пакета меню и форма брони в одном тёплом серифном путешествии. Статика на Astro с GSAP-хореографией — летает на телефонах гостей.",
+          text: "Цифровая витрина дома торжеств в Кимовске — целиком. Первый этап живой: четыре зала, три меню и форма брони в тёплом серифном путешествии. Второй — интернет-магазин банкетной доставки — уже в разработке.",
           stack: ["Astro 5", "TypeScript", "GSAP", "Lenis"],
           link: "https://noviykovcheg.ru",
           linkLabel: "на сайт",
@@ -558,8 +572,8 @@ export const dict = {
           ],
         },
       ],
-      placeholderTitle: "Интернет-магазин доставки — в разработке",
-      placeholderNote: "Заказ банкетных блюд для «Нового Ковчега». Кейс встанет сюда после запуска.",
+      placeholderTitle: "Свободный слот",
+      placeholderNote: "Следующим кейсом может стать ваш проект — напишите нам.",
       stampSoon: "скоро",
       closing:
         "Хотите такой же разбор своей задачи — напишите, покажем, что можно сделать.",
@@ -774,7 +788,7 @@ export const dict = {
       tag: "// case-02",
       client: "Новый Ковчег \u00b7 дом торжеств, Кимовск",
       title: "Новый Ковчег",
-      lead: "Дому торжеств с четырьмя залами нужен был сайт, который продаёт атмосферу и приводит брони. Мы собрали тёплый серифный лендинг с нуля: своя дизайн-система, постановочные фото, форма брони, прилетающая владельцу прямо в Telegram.",
+      lead: "Мы делаем для площадки всё цифровое присутствие целиком. Первый этап \u2014 тёплый серифный лендинг, который продаёт атмосферу четырёх залов и приводит брони владельцу прямо в Telegram. Второй \u2014 интернет-магазин банкетной доставки \u2014 уже в разработке на той же дизайн-системе.",
       play: "на сайт",
       link: "https://noviykovcheg.ru",
       shots: [
@@ -810,7 +824,21 @@ export const dict = {
       stack: ["Astro 5", "TypeScript", "GSAP", "Lenis", "Sharp", "PHP \u2192 Telegram"],
       ctaH: "Хотите сайт, который продаёт атмосферу?",
       ctaBtn: "обсудить в Telegram",
-      note: "// дальше у этого клиента: интернет-магазин банкетной доставки \u2014 уже в разработке",
+      stagesH: "Дорожная карта",
+      stages: [
+        {
+          st: "этап 01 \u00b7 live",
+          live: true,
+          name: "Лендинг с бронью",
+          text: "Четыре зала, меню, FAQ и лид-форма \u2014 цифровая входная дверь площадки.",
+        },
+        {
+          st: "этап 02 \u00b7 в разработке",
+          live: false,
+          name: "Интернет-магазин доставки",
+          text: "Заказ банкетных блюд онлайн \u2014 та же дизайн-система, единый бренд.",
+        },
+      ],
     },
     ck: {
       aria: "Командная палитра",
