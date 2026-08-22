@@ -54,8 +54,8 @@ function Pendant() {
     <group position={[0.55, 1.55, 0]}>
       <group ref={pivot}>
         {/* цепочка уходит вверх за кадр */}
-        <mesh position={[0, 1.6, 0]}>
-          <cylinderGeometry args={[0.016, 0.016, 3.2, 8]} />
+        <mesh position={[0, 2.6, 0]}>
+          <cylinderGeometry args={[0.016, 0.016, 5.2, 8]} />
           <meshStandardMaterial color={GOLD} metalness={0.85} roughness={0.3} />
         </mesh>
         <mesh position={[0, 0.1, 0]} rotation-x={Math.PI / 2}>

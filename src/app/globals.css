@@ -2702,3 +2702,37 @@ body:has(.cpage-nk) .btn-primary {
     animation: none;
   }
 }
+
+/* ── С2: спуск по цепочке — нить в правом поле, кристалл едет по скроллу ── */
+.nk-pendant-rail {
+  position: fixed;
+  top: 0;
+  left: calc(50% + 448px);
+  width: 170px;
+  height: 300px;
+  z-index: 30;
+  pointer-events: none;
+  will-change: transform;
+}
+.nk-tiltbox {
+  width: 100%;
+  height: 100%;
+  transform-origin: 117px -8px;
+  will-change: transform;
+}
+.nk-rail-line {
+  position: fixed;
+  top: 0;
+  left: calc(50% + 448px + 120px);
+  width: 1.6px;
+  height: 0;
+  background: rgba(200, 169, 106, 0.5);
+  z-index: 29;
+  pointer-events: none;
+}
+@media (max-width: 1239px) {
+  .nk-pendant-rail,
+  .nk-rail-line {
+    display: none;
+  }
+}
