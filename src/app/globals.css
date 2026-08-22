@@ -2894,3 +2894,32 @@ body:has(.cpage-nk) .btn-primary {
   .nk-tassel.tl { left: 10%; }
   .nk-tassel.tr { right: 10%; }
 }
+
+/* ── вечерний зал: кейс ковчега уважает тёмную тему сайта ──
+   палитра из тёмных секций самого лендинга: чернила #171310, крем-текст,
+   золотые линии. Шапка-бархат и подвеска остаются как были */
+html[data-theme="dark"] body:has(.cpage-nk) {
+  --paper: #14100b;
+  --paper-2: #1d1712;
+  --surface: #241e19;
+  --ink: #f3ede3;
+  --ink-60: rgba(243, 237, 227, 0.68);
+  --ink-40: rgba(243, 237, 227, 0.44);
+  --line: rgba(200, 169, 106, 0.28);
+  --fw-ink: rgba(243, 237, 227, 0.14);
+}
+html[data-theme="dark"] .cpage-nk .cp-sec h2::before {
+  background: rgba(23, 19, 16, 0.55);
+}
+html[data-theme="dark"] .cpage-nk .cl-stack i {
+  background: #241e19;
+}
+html[data-theme="dark"] .cpk-stage.is-live {
+  background: #241e19;
+}
+html[data-theme="dark"] .cpage-nk .cp-cta {
+  background: #1d1712;
+}
+html[data-theme="dark"] .nk-wm-bg {
+  color: rgba(200, 169, 106, 0.15);
+}
