@@ -88,22 +88,6 @@ function Pendant() {
             <capsuleGeometry args={[0.1, 0.12, 8, 16]} />
             <meshBasicMaterial color="#ffffff" />
           </mesh>
-          {/* зрачки и улыбка — тёплые чернила ковчега */}
-          <mesh position={[FACE_X - EYE_GAP + 0.015, EYE_Y, EYE_Z + 0.055]}>
-            <sphereGeometry args={[0.042, 12, 12]} />
-            <meshBasicMaterial color="#171310" />
-          </mesh>
-          <mesh position={[FACE_X + EYE_GAP + 0.015, EYE_Y, EYE_Z + 0.055]}>
-            <sphereGeometry args={[0.042, 12, 12]} />
-            <meshBasicMaterial color="#171310" />
-          </mesh>
-          <mesh
-            position={[FACE_X, EYE_Y - 0.28, EYE_Z + 0.02]}
-            rotation-z={Math.PI * 1.08}
-          >
-            <torusGeometry args={[0.13, 0.02, 8, 20, Math.PI * 0.84]} />
-            <meshBasicMaterial color="#171310" />
-          </mesh>
         </group>
       </group>
     </group>
