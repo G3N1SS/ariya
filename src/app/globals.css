@@ -1120,10 +1120,11 @@ html[lang="ru"] .hero h1 {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink-60);
-  background: rgba(255, 255, 255, 0.82);
+  /* подложка из токена: в тёмной теме белый хардкод давал белое-на-белом */
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
 }
 .stamp div { padding: 4px 10px; }
-.stamp div + div { border-top: 1px solid rgba(13, 16, 51, 0.12); }
+.stamp div + div { border-top: 1px solid var(--line); }
 .stamp i {
   color: var(--blue);
   font-style: normal;
