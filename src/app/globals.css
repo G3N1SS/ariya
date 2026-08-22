@@ -2867,19 +2867,24 @@ body:has(.cpage-nk) .btn-primary {
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .05 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.nk-wm {
-  position: fixed;
-  right: 20px;
-  bottom: 14px;
-  z-index: 0;
-  width: 300px;
+/* водяной знак в фоне блока: скроллится с контентом, не спорит с подвеской */
+.cpage-nk .cp-sec {
+  position: relative;
+}
+.nk-wm-bg {
+  position: absolute;
+  right: -60px;
+  top: 54%;
+  transform: translateY(-50%);
+  width: min(560px, 72%);
   height: auto;
-  color: rgba(200, 169, 106, 0.16);
+  color: rgba(200, 169, 106, 0.12);
+  z-index: -1;
   pointer-events: none;
   user-select: none;
 }
-@media (max-width: 1239px) {
-  .nk-wm { display: none; }
+@media (max-width: 899px) {
+  .nk-wm-bg { display: none; }
 }
 @media (max-width: 720px) {
   .cpage-nk .cp-sec h2 { gap: 12px; padding-bottom: 20px; }
