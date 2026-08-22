@@ -2869,14 +2869,12 @@ body:has(.cpage-nk) .btn-primary {
 }
 .nk-wm {
   position: fixed;
-  right: 22px;
-  bottom: 6px;
+  right: 20px;
+  bottom: 14px;
   z-index: 0;
-  font-family: var(--font-nk), Georgia, serif;
-  font-style: italic;
-  font-size: 150px;
-  line-height: 1;
-  color: rgba(200, 169, 106, 0.12);
+  width: 300px;
+  height: auto;
+  color: rgba(200, 169, 106, 0.16);
   pointer-events: none;
   user-select: none;
 }
