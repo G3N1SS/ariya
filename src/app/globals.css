@@ -2875,7 +2875,8 @@ body:has(.cpage-nk) .btn-primary {
   position: absolute;
   left: 50%;
   top: 54%;
-  transform: translate(-50%, -50%);
+  /* корпус корабля в вьюбоксе смещён вправо — центруем по визуальному весу */
+  transform: translate(-57%, -50%);
   width: min(560px, 72%);
   height: auto;
   color: rgba(200, 169, 106, 0.12);
