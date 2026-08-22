@@ -2583,3 +2583,122 @@ body:has(.cpage-nk) .btn-primary {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Д1: вход в зал — бархатная шапка кейса ковчега ── */
+.nk-hero {
+  position: relative;
+  width: 100vw;
+  margin: -110px 0 40px calc(50% - 50vw);
+  padding: 150px 24px 68px;
+  background: linear-gradient(180deg, #120d07 0%, #171310 44%, #262019 100%);
+  overflow: hidden;
+}
+.nk-hero-in {
+  position: relative;
+  z-index: 3;
+  max-width: 832px;
+  margin: 0 auto;
+}
+/* текст на бархате — крем */
+.nk-hero .cp-back {
+  color: rgba(243, 237, 227, 0.62);
+  border-bottom-color: rgba(243, 237, 227, 0.3);
+}
+.nk-hero .cp-back:hover {
+  color: #f3ede3;
+}
+.nk-hero .cp-client {
+  color: rgba(243, 237, 227, 0.58);
+}
+.nk-hero h1 {
+  color: #f3ede3;
+}
+.cpage-nk h1 em {
+  font-style: italic;
+  color: #c8a96a;
+}
+.nk-hero .cp-lead {
+  color: rgba(243, 237, 227, 0.78);
+}
+.nk-hero .cp-tag {
+  color: #c8a96a;
+}
+
+/* занавес: вертикальные складки, затухающие к центру сцены */
+.nk-curtain {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(21vw, 240px);
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    93deg,
+    #34220f 0 24px,
+    #1d1409 24px 50px
+  );
+  -webkit-mask: linear-gradient(90deg, #000 42%, transparent);
+  mask: linear-gradient(90deg, #000 42%, transparent);
+}
+.nk-curtain.l {
+  left: 0;
+}
+.nk-curtain.r {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+/* люстра качается, хрустальные капли переливаются */
+.nk-chand {
+  position: absolute;
+  left: 50%;
+  top: 58px;
+  width: min(200px, 26vw);
+  z-index: 1;
+  transform-origin: 50% 0;
+  animation: nk-sway 5.4s ease-in-out infinite;
+}
+@keyframes nk-sway {
+  0%, 100% { transform: translateX(-50%) rotate(-2.2deg); }
+  50% { transform: translateX(-50%) rotate(2.2deg); }
+}
+.nk-chand .dr {
+  animation: nk-glint 2.8s ease-in-out infinite;
+}
+.nk-chand .d1 { animation-delay: 0.5s; }
+.nk-chand .d2 { animation-delay: 1s; }
+.nk-chand .d3 { animation-delay: 1.5s; }
+.nk-chand .d4 { animation-delay: 2s; }
+@keyframes nk-glint {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Призма-подвеска: свисает с «потолка» шапки справа от текста */
+.nk-pendant {
+  position: absolute;
+  top: -6px;
+  right: clamp(28px, 11vw, 210px);
+  width: 190px;
+  height: 340px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 899px) {
+  .nk-pendant {
+    display: none;
+  }
+  .nk-hero {
+    padding-top: 130px;
+  }
+  .nk-curtain {
+    width: 17vw;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nk-chand,
+  .nk-chand .dr {
+    animation: none;
+  }
+}

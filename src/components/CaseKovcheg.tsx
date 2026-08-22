@@ -1,29 +1,55 @@
 import { dict, contacts, type Locale } from "@/lib/dict";
+import CasePendant from "./CasePendant";
 
 // Страница кейса «Новый Ковчег»: общая для обеих локалей, тексты из dict.
 // Скоуп .cpage-nk красит страницу в палитру самого проекта: крем/чернила/шампань
 export default function CaseKovcheg({ locale }: { locale: Locale }) {
   const t = dict[locale].casePageNk;
+  // «Новый Ковчег» → курсивно-золотое второе слово, как в лого продукта
+  const [tFirst, ...tRest] = t.title.split(" ");
   return (
     <main className="cpage cpage-nk">
-      <a className="cp-back" href={t.backHref}>
-        {t.back}
-      </a>
-      <div className="cp-head">
-        <span className="cp-tag">{t.tag}</span>
-        <span className="cp-client">{t.client}</span>
-      </div>
-      <h1>{t.title}</h1>
-      <p className="cp-lead">{t.lead}</p>
-      <a
-        className="btn btn-primary"
-        href={t.link}
-        target="_blank"
-        rel="noopener"
-        data-magnetic
-      >
-        {t.play} ↗
-      </a>
+      {/* Д1: вход в зал — бархатный занавес, качающаяся люстра,
+          Призма-хрусталь свисает подвеской на золотой цепочке */}
+      <section className="nk-hero">
+        <i className="nk-curtain l" aria-hidden="true" />
+        <i className="nk-curtain r" aria-hidden="true" />
+        <svg className="nk-chand" viewBox="0 0 170 96" aria-hidden="true">
+          <line x1="85" y1="0" x2="85" y2="16" stroke="#c8a96a" strokeWidth="2.4" />
+          <rect x="25" y="16" width="120" height="4.6" rx="2.3" fill="#c8a96a" />
+          {[36, 60, 85, 110, 134].map((x, i) => (
+            <ellipse key={x} className={`dr d${i}`} cx={x} cy={27.5} rx={3.1} ry={6} fill="#fff6e2" />
+          ))}
+          <rect x="53" y="40" width="64" height="4" rx="2" fill="#c8a96a" />
+          {[64, 85, 106].map((x, i) => (
+            <ellipse key={x} className={`dr d${i + 1}`} cx={x} cy={51} rx={2.8} ry={5.4} fill="#fff6e2" />
+          ))}
+          <circle cx="85" cy="18" r="2.6" fill="#e9d9ae" />
+        </svg>
+        <CasePendant />
+        <div className="nk-hero-in">
+          <a className="cp-back" href={t.backHref}>
+            {t.back}
+          </a>
+          <div className="cp-head">
+            <span className="cp-tag">{t.tag}</span>
+            <span className="cp-client">{t.client}</span>
+          </div>
+          <h1>
+            {tFirst} <em>{tRest.join(" ")}</em>
+          </h1>
+          <p className="cp-lead">{t.lead}</p>
+          <a
+            className="btn btn-primary"
+            href={t.link}
+            target="_blank"
+            rel="noopener"
+            data-magnetic
+          >
+            {t.play} ↗
+          </a>
+        </div>
+      </section>
 
       <div className="cp-shots">
         {t.shots.map((sh) => (
