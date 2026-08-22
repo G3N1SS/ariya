@@ -31,8 +31,8 @@ function Pendant() {
   useFrame((f) => {
     const t = f.clock.elapsedTime;
     // маятник вокруг точки подвеса + едва заметное дыхание
-    pivot.current.rotation.z = Math.sin(t * 0.72) * 0.085;
-    pivot.current.rotation.x = Math.sin(t * 0.53) * 0.03;
+    pivot.current.rotation.z = Math.sin(t * 0.72) * 0.062;
+    pivot.current.rotation.x = Math.sin(t * 0.53) * 0.02;
     const breathe = 1 + Math.sin(t * 1.1) * 0.008;
     pivot.current.scale.setScalar(breathe);
 
@@ -51,7 +51,7 @@ function Pendant() {
   // точка подвеса — вершина кристалла; всё тело свисает из неё
   const APEX = { x: SHEAR * 1.52, y: 1.52 };
   return (
-    <group position={[0, 1.55, 0]}>
+    <group position={[0.55, 1.55, 0]}>
       <group ref={pivot}>
         {/* цепочка уходит вверх за кадр */}
         <mesh position={[0, 1.6, 0]}>
@@ -114,7 +114,7 @@ export default function PendantScene() {
   return (
     <Canvas
       dpr={[1, 1.5]}
-      camera={{ position: [0, -0.35, 8.6], fov: 30 }}
+      camera={{ position: [0, -0.35, 9.6], fov: 30 }}
       gl={{ alpha: true, antialias: true }}
       style={{ width: "100%", height: "100%" }}
     >

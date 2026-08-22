@@ -2678,9 +2678,9 @@ body:has(.cpage-nk) .btn-primary {
 .nk-pendant {
   position: absolute;
   top: -6px;
-  right: clamp(28px, 11vw, 210px);
-  width: 190px;
-  height: 340px;
+  right: clamp(16px, 10vw, 190px);
+  width: 220px;
+  height: 350px;
   z-index: 2;
   pointer-events: none;
 }
