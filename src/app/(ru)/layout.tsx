@@ -1,3 +1,4 @@
+import Metrika from "@/components/fx/Metrika";
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { fontVars } from "@/lib/fonts";
@@ -71,6 +72,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <Metrika />
       </body>
     </html>
   );

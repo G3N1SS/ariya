@@ -22,7 +22,7 @@ const SVC_DEMOS = ["phone", "tg", "web"] as const;
 export default function Site({ locale }: { locale: Locale }) {
   const t = dict[locale];
   const tgHref = contacts.tg;
-  const mailHref = contacts.email ? `mailto:${contacts.email}` : "#";
+  const mailHref = contacts.email ? `mailto:${contacts.email}` : null;
 
   return (
     <>
@@ -283,7 +283,7 @@ export default function Site({ locale }: { locale: Locale }) {
                 {t.cta.btnTg}
               </a>
               {/* почтовая кнопка появится вместе с почтой — мёртвых ссылок не держим */}
-              {contacts.email && (
+              {mailHref && (
                 <a className="btn btn-ghost" href={mailHref} data-magnetic>
                   {t.cta.btnMail}
                 </a>

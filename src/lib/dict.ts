@@ -241,6 +241,16 @@ export const dict = {
       backHref: "/en",
       releases: [
         {
+          v: "1.6",
+          date: "22.08.2026",
+          items: [
+            "case 01 \u00ab\u041dovy Uroven\u00bb: game-styled page \u2014 night sky, neon, 3D tower diorama",
+            "case 02 \u00abNovy Kovcheg\u00bb: velvet entrance, chandelier, crystal Prisma on a chain",
+            "era-strip posters on the home page, roadmap of client stages",
+            "lead form plumbing + analytics goals \u2014 wake up with the domain",
+          ],
+        },
+        {
           v: "1.5",
           date: "18.08.2026",
           items: [
@@ -669,6 +679,16 @@ export const dict = {
       back: "← на сайт",
       backHref: "/",
       releases: [
+        {
+          v: "1.6",
+          date: "22.08.2026",
+          items: [
+            "кейс 01 «Новый уровень»: страница в стилистике игры — ночное небо, неон, 3D-диорама вышек",
+            "кейс 02 «Новый Ковчег»: бархатный вход, люстра, Призма-хрусталь на цепочке",
+            "постеры-ленты на главной, дорожная карта этапов клиента",
+            "обвязка лид-формы и цели аналитики — проснутся вместе с доменом",
+          ],
+        },
         {
           v: "1.5",
           date: "18.08.2026",
