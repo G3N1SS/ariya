@@ -2736,3 +2736,156 @@ body:has(.cpage-nk) .btn-primary {
     display: none;
   }
 }
+
+/* ═══ полировка кейса ковчега: У1 фестоны · У3 медальоны · У5 бумага · У8 reveal ═══ */
+
+/* У5: настоящий Playfair — голос продукта */
+.cpage-nk h1,
+.cpage-nk .cp-sec h2,
+.cpage-nk .cp-cta b,
+.cpk-stage b {
+  font-family: var(--font-nk), Georgia, "Times New Roman", serif;
+}
+
+/* У1: фестонная кромка занавеса + кисточки */
+.nk-hero {
+  overflow: visible;
+}
+.nk-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -27px;
+  height: 28px;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(16.5px 16.5px at 15px 0, transparent 92%, rgba(200, 169, 106, 0.55) 94%, transparent 100%) repeat-x,
+    radial-gradient(15px 15px at 15px 0, #262019 97%, transparent 100%) repeat-x;
+  background-size: 30px 28px;
+}
+.nk-tassel {
+  position: absolute;
+  bottom: -50px;
+  width: 2px;
+  height: 30px;
+  background: var(--nk, rgba(200, 169, 106, 0.55));
+  background: rgba(200, 169, 106, 0.55);
+  z-index: 2;
+  pointer-events: none;
+}
+.nk-tassel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 13px;
+  background: #c8a96a;
+  clip-path: polygon(50% 0, 100% 30%, 72% 100%, 28% 100%, 0 30%);
+}
+.nk-tassel.tl { left: 18%; }
+.nk-tassel.tr { right: 18%; }
+
+/* У3: главы, медальоны и линейки с ромбом */
+.cpage-nk { counter-reset: nksec; }
+.cpage-nk .cp-sec {
+  counter-increment: nksec;
+}
+.cpage-nk .cp-sec::before {
+  content: attr(data-chapter);
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b08f4e;
+  margin-bottom: 12px;
+}
+.cpage-nk .cp-sec h2 {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  padding-bottom: 24px;
+}
+.cpage-nk .cp-sec h2::before {
+  content: counter(nksec, decimal-leading-zero);
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.4px solid #b08f4e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: #b08f4e;
+  background: rgba(251, 247, 238, 0.65);
+}
+.cpage-nk .cp-sec h2::after {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15px;
+  font-size: 11px;
+  line-height: 15px;
+  text-align: center;
+  color: #b08f4e;
+  background:
+    linear-gradient(rgba(200, 169, 106, 0.5), rgba(200, 169, 106, 0.5)) no-repeat left center / calc(50% - 20px) 1px,
+    linear-gradient(rgba(200, 169, 106, 0.5), rgba(200, 169, 106, 0.5)) no-repeat right center / calc(50% - 20px) 1px;
+}
+/* прорисовка линеек по скроллу — там, где браузер умеет view-timeline */
+@supports (animation-timeline: view()) {
+  .cpage-nk .cp-sec h2::after {
+    animation: nk-rule-draw linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 55%;
+  }
+  @keyframes nk-rule-draw {
+    from {
+      background-size: 0 1px, 0 1px;
+      opacity: 0;
+    }
+    to {
+      background-size: calc(50% - 20px) 1px, calc(50% - 20px) 1px;
+      opacity: 1;
+    }
+  }
+}
+
+/* У5: бумажное зерно на всю страницу и водяной вензель в поле */
+.nk-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .08 0 0 0 0 .05 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.nk-wm {
+  position: fixed;
+  right: 22px;
+  bottom: 6px;
+  z-index: 0;
+  font-family: var(--font-nk), Georgia, serif;
+  font-style: italic;
+  font-size: 150px;
+  line-height: 1;
+  color: rgba(200, 169, 106, 0.12);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 1239px) {
+  .nk-wm { display: none; }
+}
+@media (max-width: 720px) {
+  .cpage-nk .cp-sec h2 { gap: 12px; padding-bottom: 20px; }
+  .cpage-nk .cp-sec h2::before { width: 38px; height: 38px; font-size: 13.5px; }
+  .nk-tassel.tl { left: 10%; }
+  .nk-tassel.tr { right: 10%; }
+}

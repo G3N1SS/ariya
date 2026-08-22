@@ -396,6 +396,7 @@ export const dict = {
       stack: ["Astro 5", "TypeScript", "GSAP", "Lenis", "Sharp", "PHP \u2192 Telegram"],
       ctaH: "Want a site that sells the atmosphere?",
       ctaBtn: "discuss in Telegram",
+      ch: "chapter",
       stagesH: "Roadmap",
       stages: [
         {
@@ -824,6 +825,7 @@ export const dict = {
       stack: ["Astro 5", "TypeScript", "GSAP", "Lenis", "Sharp", "PHP \u2192 Telegram"],
       ctaH: "Хотите сайт, который продаёт атмосферу?",
       ctaBtn: "обсудить в Telegram",
+      ch: "глава",
       stagesH: "Дорожная карта",
       stages: [
         {
