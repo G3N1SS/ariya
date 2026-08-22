@@ -2433,3 +2433,109 @@ body:has(.cpage-nu) .btn-primary:hover {
     animation: none;
   }
 }
+
+/* ═══ страница кейса «Новый Ковчег» в палитре самого проекта ═══
+   тёплый крем/чернила/шампань и серифные заголовки — сайт-визитка
+   площадки продолжается в её кейсе. Тёплая в обеих темах Арии */
+body:has(.cpage-nk) {
+  --paper: #f3ede3;
+  --paper-2: #e9e1d2;
+  --surface: #efe8db;
+  --ink: #171310;
+  --ink-60: rgba(23, 19, 16, 0.66);
+  --ink-40: rgba(23, 19, 16, 0.44);
+  --line: rgba(23, 19, 16, 0.16);
+  --blue: #b08f4e; /* акцент страницы — шампань проекта */
+  --blue-press: #96763a;
+  --fw-ink: rgba(23, 19, 16, 0.14);
+  --fw-blue: rgba(176, 143, 78, 0.5);
+}
+body:has(.cpage-nk) .site-header {
+  background: rgba(243, 237, 227, 0.8);
+}
+body:has(.cpage-nk) .btn-primary {
+  color: #171310;
+  box-shadow: 0 10px 26px rgba(176, 143, 78, 0.35);
+}
+
+/* серифные заголовки — голос проекта */
+.cpage-nk h1,
+.cpage-nk .cp-sec h2,
+.cpage-nk .cp-cta b {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.cpage-nk .cp-tag,
+.cpage-nk .cp-client {
+  font-family: var(--font-text);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11.5px;
+}
+.cpage-nk .cp-tag {
+  color: #b08f4e;
+}
+
+/* фирменная деталь ковчега: шампань-линия внутри фото-рамки */
+.cpage-nk .cp-shots figure,
+.cpage-nk .cp-eras figure {
+  position: relative;
+}
+.cpage-nk .cp-shots figure::after,
+.cpage-nk .cp-eras figure::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  bottom: calc(10px + 34px); /* не залезать на подпись */
+  border: 1px solid rgba(200, 169, 106, 0.45);
+  border-radius: 10px;
+  pointer-events: none;
+}
+.cpage-nk .cp-shots img,
+.cpage-nk .cp-eras img {
+  border-color: rgba(23, 19, 16, 0.18);
+  box-shadow: 0 22px 50px rgba(23, 19, 16, 0.18);
+}
+.cpage-nk .cp-shots figcaption,
+.cpage-nk .cp-eras figcaption {
+  font-family: var(--font-text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+}
+
+/* маркеры списка и номера шагов — без мono, шампань */
+.cpage-nk .cp-built li::before {
+  content: "✦";
+  font-family: var(--font-text);
+  color: #b08f4e;
+}
+.cpage-nk .cp-step .n {
+  font-family: var(--font-text);
+  letter-spacing: 0.12em;
+  color: #b08f4e;
+}
+
+/* кадры «ещё» — три колонки */
+.cpk-more {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* CTA-карточка: крем-поверхность с шампань-рамкой */
+.cpage-nk .cp-cta {
+  background: #efe8db;
+  border-color: rgba(200, 169, 106, 0.6);
+  box-shadow: 0 24px 60px rgba(23, 19, 16, 0.12);
+}
+.cpk-note {
+  margin-top: 18px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-40);
+}
+@media (max-width: 720px) {
+  .cpk-more {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}

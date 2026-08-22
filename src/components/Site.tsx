@@ -198,7 +198,7 @@ export default function Site({ locale }: { locale: Locale }) {
             </div>
           ))}
           <div className="case-poster" data-reveal>
-            <span className="tag">{"// case-02"}</span>
+            <span className="tag">{"// case-03"}</span>
             <span className="tickmark tm-tl"></span>
             <span className="tickmark tm-tr"></span>
             <span className="tickmark tm-bl"></span>
@@ -210,7 +210,7 @@ export default function Site({ locale }: { locale: Locale }) {
             <div className="dim">1440 × 900</div>
             <div className="stamp">
               <div>
-                {"case-02 "}
+                {"case-03 "}
                 <i>{"//"}</i> {t.cases.stampSoon}
               </div>
               <div>2026 · ariya</div>
