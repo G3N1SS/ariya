@@ -793,6 +793,8 @@ html[lang="ru"] .hero h1 {
   .cp-shots {
     grid-template-columns: 1fr;
     max-width: 300px;
+    /* колонка уже страницы — без авто-полей липла к левому краю */
+    margin-inline: auto;
   }
 }
 .cp-sec {
