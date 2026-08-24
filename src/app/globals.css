@@ -558,11 +558,16 @@ html[lang="ru"] .hero h1 {
   .cl-strip {
     max-width: 460px;
   }
-  /* на узком штамп в углу иначе ложится на подписи ленты,
-     а абсолютный тег «// case-01» — на строку клиента */
+  /* на узком тег «// case-01» абсолютный — копия опускается ниже него,
+     а штамп переезжает в правый верхний угол (внизу он ложился на подписи) */
   .case-live {
-    padding-top: 52px;
-    padding-bottom: 116px;
+    padding-top: 64px;
+    padding-bottom: 48px;
+  }
+  .case-poster .stamp {
+    top: 12px;
+    right: 12px;
+    bottom: auto;
   }
 }
 
