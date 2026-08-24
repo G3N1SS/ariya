@@ -700,21 +700,24 @@ function Composition() {
           clone = undefined;
         }
         if (clone) {
-          // комплементарный клиппинг: клон видим ТОЛЬКО в прямоугольнике лого,
-          // оригинал — везде, кроме него (дырка polygon evenodd). Вне зоны
-          // текст остаётся нетронутым оригиналом — никаких сдвигов цвета
-          const ix1 = Math.max(minX - pad, r.left);
-          const iy1 = Math.max(minY - pad, r.top);
-          const ix2 = Math.min(maxX + pad, r.right);
-          const iy2 = Math.min(maxY + pad, r.bottom);
-          const lx1 = (ix1 - r.left).toFixed(1);
-          const ly1 = (iy1 - r.top).toFixed(1);
-          const lx2 = (ix2 - r.left).toFixed(1);
-          const ly2 = (iy2 - r.top).toFixed(1);
+          // комплементарный клиппинг: клон видим ТОЛЬКО в зоне лого, оригинал —
+          // везде, кроме неё. Зона — ЭЛЛИПС (описанный вокруг bbox, чтобы
+          // накрыть углы диагональных брусков): у прямоугольника кромка
+          // читалась как «квадратный контейнер». Дырка в оригинале — тот же
+          // эллипс 24-точечным polygon (один контур со швом из угла, evenodd)
+          const cx = (minX + maxX) / 2 - r.left;
+          const cy = (minY + maxY) / 2 - r.top;
+          const rx = ((maxX - minX) / 2 + pad) * 1.22;
+          const ry = ((maxY - minY) / 2 + pad) * 1.22;
           const w = r.width.toFixed(1);
           const h = r.height.toFixed(1);
-          clone.style.clipPath = `inset(${ly1}px ${(r.width - Number(lx2)).toFixed(1)}px ${(r.height - Number(ly2)).toFixed(1)}px ${lx1}px)`;
-          el.style.clipPath = `polygon(evenodd, 0 0, ${w}px 0, ${w}px ${h}px, 0 ${h}px, 0 0, ${lx1}px ${ly1}px, ${lx2}px ${ly1}px, ${lx2}px ${ly2}px, ${lx1}px ${ly2}px, ${lx1}px ${ly1}px)`;
+          clone.style.clipPath = `ellipse(${rx.toFixed(1)}px ${ry.toFixed(1)}px at ${cx.toFixed(1)}px ${cy.toFixed(1)}px)`;
+          let hole = "";
+          for (let k = 0; k <= 24; k++) {
+            const a = (k / 24) * Math.PI * 2;
+            hole += `, ${(cx + rx * Math.cos(a)).toFixed(1)}px ${(cy + ry * Math.sin(a)).toFixed(1)}px`;
+          }
+          el.style.clipPath = `polygon(evenodd, 0 0, ${w}px 0, ${w}px ${h}px, 0 ${h}px, 0 0${hole})`;
           clone.style.width = r.width + "px";
           clone.style.transform = `translate(${r.left + window.scrollX}px, ${
             r.top + window.scrollY
