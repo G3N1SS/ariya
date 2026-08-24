@@ -2061,6 +2061,17 @@ html[lang="en"] .bf-preview::before {
     width: clamp(150px, 32vw, 240px);
     filter: drop-shadow(0 16px 32px rgba(13, 16, 51, 0.12));
   }
+  /* кнопки хиро — во всю ширину колонки; сама .hero-cta — flex-айтем
+     копии и без stretch ужимается до ширины контента */
+  .hero-cta {
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    width: 100%;
+  }
+  .hero-cta .btn {
+    width: 100%;
+  }
   .svc-grid,
   .why-grid {
     grid-template-columns: 1fr;
