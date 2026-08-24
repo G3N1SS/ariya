@@ -578,7 +578,12 @@ html[lang="ru"] .hero h1 {
     padding-inline: 10px;
     white-space: nowrap;
   }
-  /* чипы стека — горизонтальной лентой вместо рваных двух рядов */
+  /* чипы стека — горизонтальной лентой вместо рваных двух рядов.
+     min-width:0 обязателен: nowrap-лента иначе распирает грид-колонку
+     до своей полной ширины, и весь контент вылезает за карточку */
+  .cl-grid > * {
+    min-width: 0;
+  }
   .case-live .cl-stack {
     flex-wrap: nowrap;
     overflow-x: auto;
