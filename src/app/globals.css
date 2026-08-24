@@ -569,6 +569,28 @@ html[lang="ru"] .hero h1 {
     right: 12px;
     bottom: auto;
   }
+  /* В2: пара кнопок ровными половинками в один ряд */
+  .cl-actions {
+    flex-wrap: nowrap;
+  }
+  .cl-actions .cl-btn {
+    flex: 1;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+  /* чипы стека — горизонтальной лентой вместо рваных двух рядов */
+  .case-live .cl-stack {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .case-live .cl-stack::-webkit-scrollbar {
+    display: none;
+  }
+  .case-live .cl-stack i {
+    flex: none;
+    white-space: nowrap;
+  }
 }
 
 /* ── страница кейса ── */
