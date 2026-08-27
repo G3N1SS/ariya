@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    background:
+      radial-gradient(900px 620px at 78% 30%, rgba(255, 46, 146, 0.16), transparent 62%),
+      radial-gradient(760px 560px at 12% 88%, #131843 0%, transparent 64%),
+      #0a0d26;
+    font-family: "Onest", sans-serif;
+    color: #eef1ff;
+  }
+  /* звёзды */
+  .stars { position: absolute; inset: 0; }
+  .stars i {
+    position: absolute; width: 3px; height: 3px; border-radius: 50%;
+    background: rgba(238, 241, 255, 0.85);
+  }
+  .stars i.dim { width: 2px; height: 2px; background: rgba(238, 241, 255, 0.38); }
+  /* сетка-пол как в игре */
+  .floor {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 120px;
+    background:
+      linear-gradient(rgba(255,46,146,0) 0%, rgba(255,46,146,0.10) 100%),
+      repeating-linear-gradient(90deg, rgba(238,241,255,0.10) 0 1px, transparent 1px 72px);
+    -webkit-mask-image: linear-gradient(transparent, #000 55%);
+  }
+  .wrap { position: absolute; inset: 0; padding: 62px 64px; display: flex; }
+  .copy { width: 610px; display: flex; flex-direction: column; }
+  .tag {
+    font-family: "JetBrains Mono", monospace; font-size: 24px; letter-spacing: 0.04em;
+    color: #ff2e92;
+  }
+  h1 {
+    margin-top: 26px;
+    font-family: "Unbounded", sans-serif; font-weight: 700;
+    font-size: 88px; line-height: 1.02; text-transform: uppercase;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 44px rgba(255, 46, 146, 0.35);
+  }
+  h1 span { display: block; }
+  .sub {
+    margin-top: 30px; font-size: 30px; line-height: 1.42; font-weight: 400;
+    color: rgba(238, 241, 255, 0.72); max-width: 560px;
+  }
+  .brand { margin-top: auto; display: flex; align-items: center; gap: 18px; }
+  .brand svg { display: block; }
+  .brand b {
+    font-family: "Unbounded", sans-serif; font-weight: 600; font-size: 25px; letter-spacing: 0.06em;
+  }
+  .brand span {
+    font-family: "JetBrains Mono", monospace; font-size: 19px; color: rgba(238, 241, 255, 0.5);
+    padding-top: 3px;
+  }
+  /* телефоны */
+  .shots { position: absolute; right: 10px; top: 0; bottom: 0; width: 560px; }
+  .shots img {
+    position: absolute; width: 296px; border-radius: 26px;
+    border: 1px solid rgba(238, 241, 255, 0.22);
+  }
+  .shots img.a {
+    left: 12px; top: 96px; transform: rotate(-7deg);
+    box-shadow: 0 34px 80px rgba(0, 0, 0, 0.62);
+    z-index: 1;
+  }
+  .shots img.b {
+    left: 252px; top: 40px; transform: rotate(4.5deg);
+    box-shadow: 0 0 0 1px rgba(255,46,146,0.25), 0 30px 90px rgba(255, 46, 146, 0.22), 0 34px 80px rgba(0,0,0,0.6);
+    z-index: 2;
+  }
+  .chip {
+    position: absolute; left: -18px; top: 388px; z-index: 3;
+    font-family: "JetBrains Mono", monospace; font-size: 23px; font-weight: 500;
+    color: #0a0d26; background: #ff2e92; border-radius: 999px;
+    padding: 10px 22px; transform: rotate(-8deg);
+    box-shadow: 0 0 34px rgba(255, 46, 146, 0.55);
+  }
+</style>
+</head>
+<body>
+  <div class="stars" aria-hidden="true">
+    <i style="left:4%;  top:12%"></i>
+    <i class="dim" style="left:9%;  top:64%"></i>
+    <i style="left:16%; top:30%"></i>
+    <i class="dim" style="left:23%; top:9%"></i>
+    <i class="dim" style="left:31%; top:78%"></i>
+    <i style="left:38%; top:16%"></i>
+    <i class="dim" style="left:44%; top:47%"></i>
+    <i style="left:50%; top:8%"></i>
+    <i class="dim" style="left:55%; top:26%"></i>
+    <i style="left:60%; top:70%"></i>
+    <i class="dim" style="left:66%; top:12%"></i>
+    <i style="left:72%; top:86%"></i>
+    <i class="dim" style="left:79%; top:56%"></i>
+    <i style="left:86%; top:14%"></i>
+    <i class="dim" style="left:91%; top:38%"></i>
+    <i style="left:96%; top:74%"></i>
+  </div>
+  <div class="floor" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="copy">
+      <div class="tag">// case-01 · веб-игра для T2</div>
+      <h1><span>Новый</span><span>уровень</span></h1>
+      <p class="sub">Бесконечный климбер: открывается по&nbsp;ссылке, а&nbsp;после первого захода работает без&nbsp;сети.</p>
+      <div class="brand">
+        <svg width="52" height="40" viewBox="0 0 52 40" fill="none">
+          <g transform="skewX(-22)" transform-origin="26 20">
+            <rect x="8"  y="7" width="7" height="26" rx="2.6" fill="#eef1ff"/>
+            <rect x="21" y="2" width="7" height="36" rx="2.6" fill="#ff2e92"/>
+            <rect x="34" y="7" width="7" height="26" rx="2.6" fill="#eef1ff"/>
+          </g>
+        </svg>
+        <b>АРИЯ</b>
+        <span>студия цифровых продуктов</span>
+      </div>
+    </div>
+    <div class="shots">
+      <img class="a" src="file:///Users/areg/Ariya/site/public/cases/novy-uroven.png" alt="">
+      <img class="b" src="file:///Users/areg/Ariya/site/public/cases/novy-uroven-5g.png" alt="">
+      <div class="chip">+1&nbsp;ГБ</div>
+    </div>
+  </div>
+</body>
+</html>

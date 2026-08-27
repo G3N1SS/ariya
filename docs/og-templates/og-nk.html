@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Onest:wght@400;500&family=JetBrains+Mono:wght@400&display=block" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    background:
+      radial-gradient(880px 560px at 82% 18%, rgba(200, 169, 106, 0.20), transparent 60%),
+      radial-gradient(700px 520px at 8% 96%, rgba(176, 143, 78, 0.14), transparent 62%),
+      #f3ede3;
+    font-family: "Onest", sans-serif;
+    color: #171310;
+  }
+  /* двойная золотая рамка с ✦ */
+  .frame-out { position: absolute; inset: 18px; border: 1.6px solid rgba(176, 143, 78, 0.55); }
+  .frame-in  { position: absolute; inset: 27px; border: 1px solid rgba(176, 143, 78, 0.32); }
+  .star {
+    position: absolute; left: 50%; top: 13px; transform: translateX(-50%);
+    color: #b08f4e; font-size: 21px; background: #f3ede3; padding: 0 16px; line-height: 1;
+  }
+  /* фестоны — гребешки под верхней рамкой */
+  .festoon {
+    position: absolute; left: 28px; right: 28px; top: 28px; height: 13px;
+    background: radial-gradient(13px 13px at 13px 0, rgba(176, 143, 78, 0.30) 0 12px, transparent 13px) left top / 26px 13px repeat-x;
+  }
+  /* люстра */
+  .chand { position: absolute; left: 50%; top: 28px; transform: translateX(-50%); }
+  .wrap { position: absolute; inset: 0; padding: 96px 78px 64px; display: flex; }
+  .copy { width: 600px; display: flex; flex-direction: column; }
+  .tag {
+    font-family: "Playfair Display", serif; font-weight: 600;
+    font-size: 23px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: #96763a;
+  }
+  h1 {
+    margin-top: 24px;
+    font-family: "Playfair Display", serif; font-weight: 700;
+    font-size: 96px; line-height: 1.04; letter-spacing: 0.005em;
+  }
+  h1 em { font-style: italic; font-weight: 700; }
+  .rule { margin-top: 26px; display: flex; align-items: center; gap: 14px; width: 470px; }
+  .rule i { flex: 1; height: 1px; background: rgba(176, 143, 78, 0.55); }
+  .rule span { color: #b08f4e; font-size: 15px; line-height: 1; }
+  .sub {
+    margin-top: 24px; font-size: 29px; line-height: 1.45;
+    color: rgba(23, 19, 16, 0.68); max-width: 540px;
+  }
+  .brand { margin-top: auto; display: flex; align-items: center; gap: 18px; }
+  .brand svg { display: block; }
+  .brand b {
+    font-family: "Playfair Display", serif; font-weight: 700; font-size: 27px; letter-spacing: 0.1em;
+  }
+  .brand span {
+    font-family: "JetBrains Mono", monospace; font-size: 18px; color: rgba(23, 19, 16, 0.5);
+    padding-top: 4px;
+  }
+  /* кадры в золотых паспарту */
+  .shots { position: absolute; right: 28px; top: 0; bottom: 0; width: 520px; }
+  .shots figure { position: absolute; background: #fdfbf5; padding: 12px 12px 14px; border: 1px solid rgba(176, 143, 78, 0.5); }
+  .shots img { display: block; width: 100%; }
+  .shots figure.a {
+    width: 268px; left: 20px; top: 118px; transform: rotate(-4deg);
+    box-shadow: 0 26px 60px rgba(60, 42, 16, 0.22);
+    z-index: 1;
+  }
+  .shots figure.b {
+    width: 292px; left: 216px; top: 52px; transform: rotate(3deg);
+    box-shadow: 0 30px 70px rgba(60, 42, 16, 0.30);
+    z-index: 2;
+  }
+  .shots figure.b img { aspect-ratio: 1000 / 1240; object-fit: cover; object-position: top; }
+  .shots figure.a img { aspect-ratio: 1000 / 1240; object-fit: cover; object-position: top; }
+</style>
+</head>
+<body>
+  <div class="frame-out" aria-hidden="true"></div>
+  <div class="frame-in" aria-hidden="true"></div>
+  <div class="festoon" aria-hidden="true"></div>
+
+  <svg class="chand" width="170" height="96" viewBox="0 0 170 96" aria-hidden="true">
+    <line x1="85" y1="0" x2="85" y2="16" stroke="#c8a96a" stroke-width="2.4"/>
+    <rect x="25" y="16" width="120" height="4.6" rx="2.3" fill="#c8a96a"/>
+    <ellipse cx="36"  cy="27.5" rx="3.1" ry="6" fill="#e6cf96"/>
+    <ellipse cx="60"  cy="27.5" rx="3.1" ry="6" fill="#e6cf96"/>
+    <ellipse cx="85"  cy="27.5" rx="3.1" ry="6" fill="#e6cf96"/>
+    <ellipse cx="110" cy="27.5" rx="3.1" ry="6" fill="#e6cf96"/>
+    <ellipse cx="134" cy="27.5" rx="3.1" ry="6" fill="#e6cf96"/>
+    <rect x="53" y="40" width="64" height="4" rx="2" fill="#c8a96a"/>
+    <ellipse cx="64"  cy="51" rx="2.8" ry="5.4" fill="#e6cf96"/>
+    <ellipse cx="85"  cy="51" rx="2.8" ry="5.4" fill="#e6cf96"/>
+    <ellipse cx="106" cy="51" rx="2.8" ry="5.4" fill="#e6cf96"/>
+    <circle cx="85" cy="18" r="2.6" fill="#d9bd80"/>
+  </svg>
+
+  <div class="wrap">
+    <div class="copy">
+      <div class="tag">Глава 01 · банкетные залы</div>
+      <h1>Новый <em>Ковчег</em></h1>
+      <div class="rule" aria-hidden="true"><i></i><span>✦</span><i></i></div>
+      <p class="sub">Цифровое присутствие площадки: четыре зала, меню, брони — прямо в&nbsp;Telegram владельца.</p>
+      <div class="brand">
+        <svg width="50" height="38" viewBox="0 0 52 40" fill="none">
+          <g transform="skewX(-22)" transform-origin="26 20">
+            <rect x="8"  y="7" width="7" height="26" rx="2.6" fill="#171310"/>
+            <rect x="21" y="2" width="7" height="36" rx="2.6" fill="#b08f4e"/>
+            <rect x="34" y="7" width="7" height="26" rx="2.6" fill="#171310"/>
+          </g>
+        </svg>
+        <b>АРИЯ</b>
+        <span>студия цифровых продуктов</span>
+      </div>
+    </div>
+    <div class="shots">
+      <figure class="a"><img src="file:///Users/areg/Ariya/site/public/cases/novy-kovcheg-hall.png" alt=""></figure>
+      <figure class="b"><img src="file:///Users/areg/Ariya/site/public/cases/novy-kovcheg.png" alt=""></figure>
+    </div>
+  </div>
+</body>
+</html>
