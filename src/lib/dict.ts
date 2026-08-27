@@ -169,7 +169,7 @@ export const dict = {
         },
         {
           name: "Worldwide.",
-          text: "Any timezone, English and Russian.",
+          text: "Digital products have no borders: we build for clients from any country.",
         },
       ],
     },
@@ -640,7 +640,7 @@ export const dict = {
         },
         {
           name: "Worldwide.",
-          text: "Любой часовой пояс, русский и английский.",
+          text: "Продукт цифровой — границ у него нет: делаем для клиентов из любых стран.",
         },
       ],
     },
