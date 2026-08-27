@@ -7,7 +7,7 @@
   --surface: #ffffff; /* приподнятые поверхности: экраны демо, панели */
   --ink: #0d1033;
   --ink-60: rgba(13, 16, 51, 0.62);
-  --ink-40: rgba(13, 16, 51, 0.4);
+  --ink-40: rgba(13, 16, 51, 0.55);
   --line: rgba(13, 16, 51, 0.14);
   --blue: #0c5eff;
   --blue-press: #0a4fd6;
@@ -25,7 +25,7 @@ html[data-theme="dark"] {
   --surface: #131a45;
   --ink: #e9edfc;
   --ink-60: rgba(233, 237, 252, 0.66);
-  --ink-40: rgba(233, 237, 252, 0.42);
+  --ink-40: rgba(233, 237, 252, 0.52);
   --line: rgba(233, 237, 252, 0.15);
   --blue: #2e74ff; /* ярче — держит контраст на тёмном */
   --blue-press: #4d89ff;
@@ -784,7 +784,7 @@ html[lang="ru"] .hero h1 {
   font-style: normal;
   font-family: var(--font-mono);
   font-size: 11px;
-  color: rgba(233, 237, 252, 0.45);
+  color: rgba(233, 237, 252, 0.56);
 }
 @media (max-width: 640px) {
   .cs-hint {
@@ -2316,7 +2316,7 @@ body:has(.cpage-nu) {
   --surface: #151b4a;
   --ink: #eef1ff;
   --ink-60: rgba(238, 241, 255, 0.68);
-  --ink-40: rgba(238, 241, 255, 0.44);
+  --ink-40: rgba(238, 241, 255, 0.52);
   --line: rgba(238, 241, 255, 0.16);
   --blue: #ff2e92; /* акцент страницы — неон игры */
   --blue-press: #ff4da5;
@@ -2489,7 +2489,7 @@ body:has(.cpage-nk) {
   --surface: #efe8db;
   --ink: #171310;
   --ink-60: rgba(23, 19, 16, 0.66);
-  --ink-40: rgba(23, 19, 16, 0.44);
+  --ink-40: rgba(23, 19, 16, 0.56);
   --line: rgba(23, 19, 16, 0.16);
   --blue: #b08f4e; /* акцент страницы — шампань проекта */
   --blue-press: #96763a;
@@ -2949,7 +2949,7 @@ html[data-theme="dark"] body:has(.cpage-nk) {
   --surface: #241e19;
   --ink: #f3ede3;
   --ink-60: rgba(243, 237, 227, 0.68);
-  --ink-40: rgba(243, 237, 227, 0.44);
+  --ink-40: rgba(243, 237, 227, 0.52);
   --line: rgba(200, 169, 106, 0.28);
   --fw-ink: rgba(243, 237, 227, 0.14);
 }

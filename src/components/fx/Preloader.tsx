@@ -52,9 +52,15 @@ export default function Preloader() {
     const fontsDone = track();
     if (document.fonts?.ready) document.fonts.ready.then(fontsDone);
     else fontsDone();
+    // load ждём с потолком: на медленной сети событие тянут картинки кейсов —
+    // держать людей на лоадере ради них нельзя (колбэк track идемпотентен)
     const loadDone = track();
+    let loadCap = 0;
     if (document.readyState === "complete") loadDone();
-    else window.addEventListener("load", loadDone, { once: true });
+    else {
+      window.addEventListener("load", loadDone, { once: true });
+      loadCap = window.setTimeout(loadDone, 3500);
+    }
 
     // сцену ждём только на десктопе: мобильные монтируют 3D после загрузки
     // в idle — лоадер там не должен держать людей ради компиляции шейдеров
@@ -137,6 +143,7 @@ export default function Preloader() {
     return () => {
       cancelAnimationFrame(raf);
       window.clearTimeout(sceneTimer);
+      window.clearTimeout(loadCap);
       offProgress();
     };
   }, []);
