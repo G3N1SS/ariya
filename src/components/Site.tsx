@@ -309,7 +309,7 @@ export default function Site({ locale }: { locale: Locale }) {
           <div className="foot-badges">
             <span className="fb">
               <i className="fb-dot" />
-              lighthouse 98
+              lighthouse 100
             </span>
             <span className="fb">next 16</span>
             <span className="fb">build {process.env.NEXT_PUBLIC_BUILD_DATE}</span>
