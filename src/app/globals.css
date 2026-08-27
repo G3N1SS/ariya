@@ -2973,3 +2973,175 @@ html[data-theme="dark"] .cpage-nk .cp-cta {
 html[data-theme="dark"] .nk-wm-bg {
   color: rgba(200, 169, 106, 0.15);
 }
+
+/* ── секция «команда»: слэш-карточки с призмами + открытые цифры ── */
+.team-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2.4vw, 28px);
+  margin-top: 38px;
+  padding-inline: clamp(4px, 1.4vw, 20px);
+}
+.tm-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper-2);
+  transform: skewX(-14deg);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s;
+  cursor: pointer;
+}
+.tm-card:hover {
+  transform: skewX(-14deg) translateY(-10px);
+  box-shadow: 0 24px 48px rgba(13, 16, 51, 0.12);
+}
+html[data-theme="dark"] .tm-card:hover {
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.42);
+}
+.tm-in {
+  transform: skewX(14deg);
+  padding: 40px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+.tm-zone {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-40);
+}
+.tm-txt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+.tm-txt h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.tm-line {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--blue);
+}
+.tm-txt p {
+  font-size: 13.5px;
+  color: var(--ink-60);
+  line-height: 1.5;
+  max-width: 26ch;
+}
+/* призма-аватар: канон — только два белых глаза-капсулы */
+.tm-prisma {
+  width: 56px;
+  height: 118px;
+  border-radius: 16px;
+  rotate: -11deg;
+  position: relative;
+  animation: tm-float 3.8s ease-in-out infinite;
+  box-shadow: 0 16px 30px rgba(13, 16, 51, 0.18);
+}
+.tm-card:nth-child(2) .tm-prisma { animation-delay: -1.3s; }
+.tm-card:nth-child(3) .tm-prisma { animation-delay: -2.6s; }
+@keyframes tm-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -7px; }
+}
+.tm-prisma.candy { background: linear-gradient(165deg, #9cc2ff, #2a6bf7 55%, #0b49cc); }
+.tm-prisma.neon {
+  background: linear-gradient(165deg, #ff8cc0, #f0187e 55%, #7c0d49);
+  box-shadow: 0 16px 32px rgba(240, 24, 126, 0.3);
+}
+.tm-prisma.gold {
+  background: linear-gradient(165deg, #fdfbf5, #e6cf96 45%, #b3925a);
+  box-shadow: 0 16px 30px rgba(179, 146, 90, 0.34);
+}
+.tm-prisma.hop { animation: tm-hop 0.5s cubic-bezier(0.3, 1.6, 0.4, 1); }
+@keyframes tm-hop {
+  0% { translate: 0 0; scale: 1 1; }
+  35% { translate: 0 -16px; scale: 0.94 1.06; }
+  70% { translate: 0 0; scale: 1.05 0.94; }
+  100% { scale: 1 1; }
+}
+.tm-ew {
+  position: absolute;
+  width: 16%;
+  height: 17%;
+  translate: var(--ex, 0) var(--ey, 0);
+  transition: translate 0.18s ease;
+}
+.tm-ew.l { left: 24%; top: 17%; }
+.tm-ew.r { left: 54%; top: 13.5%; }
+.tm-eye {
+  display: block;
+  width: 62%;
+  height: 100%;
+  border-radius: 999px;
+  background: #fff;
+  animation: tm-blink 4.2s infinite;
+}
+.tm-card:nth-child(2) .tm-eye { animation-delay: -1.3s; }
+.tm-card:nth-child(3) .tm-eye { animation-delay: -2.6s; }
+@keyframes tm-blink {
+  0%, 91%, 100% { transform: scaleY(1); }
+  94%, 97% { transform: scaleY(0.12); }
+}
+/* открытые цифры команды */
+.team-stats {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 62px);
+  flex-wrap: wrap;
+}
+.team-stats .st {
+  text-align: center;
+  min-width: 92px;
+}
+.team-stats b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(23px, 2.3vw, 30px);
+}
+.team-stats .st:nth-child(even) b { color: var(--blue); }
+.team-stats span {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-40);
+}
+@media (max-width: 700px) {
+  .team-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-inline: 0;
+  }
+  .tm-card { transform: skewX(-8deg); }
+  .tm-card:hover { transform: skewX(-8deg); }
+  .tm-in {
+    transform: skewX(8deg);
+    flex-direction: row;
+    padding: 18px 20px;
+    gap: 18px;
+  }
+  .tm-prisma {
+    width: 44px;
+    height: 92px;
+    flex: none;
+  }
+  .tm-txt {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .tm-txt p { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-prisma, .tm-eye { animation: none; }
+}

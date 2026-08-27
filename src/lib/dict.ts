@@ -173,8 +173,40 @@ export const dict = {
         },
       ],
     },
-    process: {
+    team: {
       idx: "// 04",
+      title: "Who these three are",
+      intro:
+        "The /// in our logo is literally us. No account managers, no relay chain: each bar is a person doing your work hands-on.",
+      members: [
+        {
+          zone: "// 01",
+          role: "product",
+          line: "talks and counts",
+          text: "Brief, quote, timeline — you always talk to the one who decides.",
+        },
+        {
+          zone: "// 02",
+          role: "front · 3D",
+          line: "draws and animates",
+          text: "Interfaces, motion, performance — everything you see and touch.",
+        },
+        {
+          zone: "// 03",
+          role: "backend",
+          line: "bots and data",
+          text: "APIs, deploys, reliability — everything that must just work.",
+        },
+      ],
+      stats: [
+        { v: "3", label: "people on the team" },
+        { v: "0", label: "managers in between" },
+        { v: "2", label: "live cases in prod" },
+        { v: "<2h", label: "median reply on TG" },
+      ],
+    },
+    process: {
+      idx: "// 05",
       title: "How it works",
       steps: [
         {
@@ -196,7 +228,7 @@ export const dict = {
       ],
     },
     cta: {
-      idx: "// 05",
+      idx: "// 06",
       title: "Tell us what you want to build.",
       sub: "Telegram is fastest. Two sentences about the task — we’ll ask the rest.",
       ticker: "available for projects /// 2026 /// worldwide",
@@ -612,8 +644,40 @@ export const dict = {
         },
       ],
     },
-    process: {
+    team: {
       idx: "// 04",
+      title: "Кто эти трое",
+      intro:
+        "Знак /// в лого — это буквально мы. Никаких аккаунт-менеджеров и передач по цепочке: каждый брусок — человек, который делает вашу задачу руками.",
+      members: [
+        {
+          zone: "// 01",
+          role: "продукт",
+          line: "говорит и считает",
+          text: "Бриф, смета, сроки — вы всегда говорите с тем, кто решает.",
+        },
+        {
+          zone: "// 02",
+          role: "фронт · 3D",
+          line: "рисует и оживляет",
+          text: "Интерфейсы, анимации, перф — всё, что вы видите и трогаете.",
+        },
+        {
+          zone: "// 03",
+          role: "бэкенд",
+          line: "боты и данные",
+          text: "API, деплой, надёжность — всё, что должно просто работать.",
+        },
+      ],
+      stats: [
+        { v: "3", label: "человека в команде" },
+        { v: "0", label: "менеджеров между нами" },
+        { v: "2", label: "кейса в проде" },
+        { v: "<2ч", label: "медианный ответ в TG" },
+      ],
+    },
+    process: {
+      idx: "// 05",
       title: "Как пойдёт работа",
       steps: [
         {
@@ -635,7 +699,7 @@ export const dict = {
       ],
     },
     cta: {
-      idx: "// 05",
+      idx: "// 06",
       title: "Расскажите, что хотите построить",
       sub: "Быстрее всего — Telegram. Опишите задачу в двух предложениях, остальное спросим сами.",
       ticker: "открыты к проектам /// 2026 /// worldwide",

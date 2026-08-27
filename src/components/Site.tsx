@@ -12,6 +12,7 @@ import HeroTypo from "./fx/HeroTypo";
 import Greeting from "./fx/Greeting";
 import ThemeToggle from "./fx/ThemeToggle";
 import Ticker from "./art/Ticker";
+import TeamRow from "./TeamRow";
 import ServiceDemo from "./art/LiveDemos";
 import ProcessRail from "./art/ProcessRail";
 import FooterWordmark from "./art/FooterWordmark";
@@ -237,6 +238,20 @@ export default function Site({ locale }: { locale: Locale }) {
                 <p>{b.text}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* команда: знак /// — это буквально трое; призмы + открытые цифры */}
+        <section id="team" className="container" aria-labelledby="team-h2">
+          <div className="s-head" data-reveal>
+            <span className="idx">{t.team.idx}</span>
+            <h2 id="team-h2">{t.team.title}</h2>
+          </div>
+          <p className="intro" data-reveal>
+            {t.team.intro}
+          </p>
+          <div data-reveal>
+            <TeamRow t={t.team} />
           </div>
         </section>
 
