@@ -11,7 +11,7 @@ export const dict = {
     meta: {
       title: "ARIYA — digital product studio",
       description:
-        "Apps, Telegram Mini Apps and websites that make money — not just exist.",
+        "Digital product studio: apps, Telegram Mini Apps, websites. You talk straight to the people who build — no account managers, no relay chain.",
     },
     brand: "ARIYA",
     nav: [
@@ -34,7 +34,7 @@ export const dict = {
     hero: {
       eyebrow: "Digital product studio",
       h1: ["Your product.", "Our performance."],
-      sub: "We build apps, Telegram Mini Apps and websites that make money — not just exist. Three people, working worldwide, and you always talk to whoever writes the code.",
+      sub: "Apps, Telegram Mini Apps, websites. Everything on this page — the 3D, the motion, the form — was made by the same hands that will build your product.",
       ctaPrimary: "Tell us about your project",
       ctaSecondary: "See our work",
       ticker: "apps /// mini apps /// websites /// worldwide",
@@ -177,7 +177,7 @@ export const dict = {
       idx: "// 04",
       title: "Who these three are",
       intro:
-        "The /// in our logo is literally us. No account managers, no relay chain: each bar is a person doing your work hands-on.",
+        "The /// in our logo is literally us. No account managers, no relay chain: each bar owns its part of your project.",
       members: [
         {
           zone: "// 01",
@@ -482,7 +482,7 @@ export const dict = {
     meta: {
       title: "АРИЯ — студия цифровых продуктов",
       description:
-        "Приложения, Telegram-миниаппы и сайты, которые зарабатывают, а не просто существуют.",
+        "Студия цифровых продуктов: приложения, Telegram-миниаппы, сайты. Пишете сразу тому, кто будет делать — без аккаунт-менеджеров и передач по цепочке.",
     },
     brand: "АРИЯ",
     nav: [
@@ -505,7 +505,7 @@ export const dict = {
     hero: {
       eyebrow: "Студия цифровых продуктов",
       h1: ["Ваш продукт.", "Наше исполнение."],
-      sub: "Делаем приложения, Telegram-миниаппы и сайты, которые зарабатывают, а не просто существуют. Нас трое, работаем по всему миру — и вы всегда говорите с тем, кто пишет код.",
+      sub: "Приложения, Telegram-миниаппы, сайты. Всё на этой странице — от 3D до формы — сделано теми же руками, которые возьмут вашу задачу.",
       ctaPrimary: "Обсудить задачу",
       ctaSecondary: "Смотреть работы",
       ticker: "приложения /// мини-аппы /// сайты /// worldwide",
@@ -648,7 +648,7 @@ export const dict = {
       idx: "// 04",
       title: "Кто эти трое",
       intro:
-        "Знак /// в лого — это буквально мы. Никаких аккаунт-менеджеров и передач по цепочке: каждый брусок — человек, который делает вашу задачу руками.",
+        "Знак /// в лого — это буквально мы. Никаких аккаунт-менеджеров и передач по цепочке: у каждого бруска — своя часть вашего проекта.",
       members: [
         {
           zone: "// 01",
