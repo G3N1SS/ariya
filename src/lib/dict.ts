@@ -46,7 +46,7 @@ export const dict = {
       items: [
         {
           name: "Mobile apps",
-          text: "iOS and Android end to end: idea, design, store release, support. Built to live and grow — not die after launch.",
+          text: "iOS and Android end to end: idea, design, store release, support. Most apps die after launch — we stay so yours keeps growing.",
         },
         {
           name: "Telegram Mini Apps",
@@ -517,7 +517,7 @@ export const dict = {
       items: [
         {
           name: "Мобильные приложения",
-          text: "iOS и Android под ключ: идея, дизайн, публикация в сторах, поддержка. Делаем так, чтобы приложение жило и росло, а не умерло после релиза.",
+          text: "iOS и Android целиком: идея, дизайн, публикация в сторах, поддержка. Большинство приложений умирает после релиза — мы остаёмся, чтобы ваше росло.",
         },
         {
           name: "Telegram Mini Apps",
