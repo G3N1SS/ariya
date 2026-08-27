@@ -26,6 +26,8 @@ export async function POST(req: Request) {
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
+  // форум-группа: тема «Заявки» (без переменной падает в General)
+  const thread = process.env.TELEGRAM_THREAD_ID;
   if (!token || !chat)
     return NextResponse.json({ ok: false, configured: false }, { status: 503 });
 
@@ -50,7 +52,11 @@ export async function POST(req: Request) {
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ chat_id: chat, text }),
+    body: JSON.stringify({
+      chat_id: chat,
+      text,
+      ...(thread ? { message_thread_id: Number(thread) } : {}),
+    }),
   });
 
   if (!res.ok) return NextResponse.json({ ok: false }, { status: 502 });
