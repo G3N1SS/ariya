@@ -97,6 +97,7 @@ a {
   inset: 0 0 auto 0;
   z-index: 50;
   background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(14px); /* Safari ≤17 */
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
@@ -189,6 +190,7 @@ html[data-theme="dark"] .site-header {
   inset: 0;
   z-index: 80;
   background: rgba(13, 16, 51, 0.32);
+  -webkit-backdrop-filter: blur(4px); /* Safari ≤17 */
   backdrop-filter: blur(4px);
   display: flex;
   align-items: flex-start;
@@ -2371,6 +2373,7 @@ body:has(.cpage-nu) .btn-primary:hover {
     radial-gradient(1.6px 1.6px at 32% 22%, rgba(140, 255, 170, 0.8), transparent 60%),
     radial-gradient(2.2px 2.2px at 90% 6%, rgba(255, 46, 146, 0.8), transparent 60%);
   background-size: 560px 560px;
+  -webkit-mask: linear-gradient(180deg, #000 0%, transparent 34%);
   mask: linear-gradient(180deg, #000 0%, transparent 34%);
   animation: nu-twinkle 4.1s ease-in-out infinite reverse;
 }
