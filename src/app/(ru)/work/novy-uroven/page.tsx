@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import CaseNovy from "@/components/CaseNovy";
 import { dict } from "@/lib/dict";
+import { caseOg } from "@/lib/og";
+
+const title = "Кейс: Новый уровень — АРИЯ";
 
 export const metadata: Metadata = {
-  title: "Кейс: Новый уровень — АРИЯ",
+  title,
   description: dict.ru.casePage.lead,
   alternates: {
     canonical: "/work/novy-uroven",
@@ -12,6 +15,13 @@ export const metadata: Metadata = {
       en: "/en/work/novy-uroven",
     },
   },
+  ...caseOg({
+    title,
+    description: dict.ru.casePage.lead,
+    path: "/work/novy-uroven",
+    image: "/og/novy-uroven.png",
+    locale: "ru",
+  }),
 };
 
 export default function Page() {
