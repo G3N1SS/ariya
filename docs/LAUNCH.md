@@ -42,7 +42,7 @@ curl -s -X POST https://АДРЕС/api/lead \
   взять `chat.id` (с минусом) и `message_thread_id`.
 - В группах у ботов privacy mode: бот не видит сообщения без упоминания.
   Отключается: @BotFather → Bot Settings → Group Privacy → Turn off
-  (после — переañadить бота в группу).
+  (после — заново добавить бота в группу).
 
 ## Чек-лист: переезд на свой домен
 
