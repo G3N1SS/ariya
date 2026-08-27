@@ -1,0 +1,40 @@
+# Ворота перед автодеплоем: Vercel собирает main без вопросов,
+# поэтому битые типы и падающий билд ловим здесь, до мержа/пуша.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Типы
+        run: npx tsc --noEmit
+
+      # линт пока не гейт: react-hooks ругается на императивный three.js-код;
+      # смотрим глазами в логе, билд не валим
+      - name: Линт (информационно)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Сборка
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
