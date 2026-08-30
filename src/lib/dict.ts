@@ -57,7 +57,7 @@ export const dict = {
           text: "Fast, modern, impossible to mistake for a template. Want proof? You’re looking at it.",
         },
       ],
-      plus: "+ bots, AI integrations, automation. If it’s digital — bring it over.",
+      plus: "+ bots, AI integrations, automation — that’s us too.",
       demo: {
         tg: {
           title: "ariya · mini app",
@@ -528,7 +528,7 @@ export const dict = {
           text: "Быстрые, современные, с дизайном, который не спутать с шаблоном. Хотите пример? Вы на нём.",
         },
       ],
-      plus: "+ боты, ИИ-интеграции, автоматизация. Если задача цифровая — приносите, разберёмся.",
+      plus: "+ боты, ИИ-интеграции, автоматизация — это всё тоже к нам.",
       demo: {
         tg: {
           title: "ariya · mini app",
