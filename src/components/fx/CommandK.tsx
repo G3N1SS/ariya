@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toggleTheme } from "@/lib/theme";
+import { ckLabel } from "@/lib/hotkey";
 
 type CkT = {
   aria: string;
@@ -66,9 +67,15 @@ export default function CommandK({ t }: { t: CkT }) {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const [mounted, setMounted] = useState(false);
+  // SSR отдаёт ⌘K, клиент после маунта подставляет свой модификатор —
+  // так нет расхождения гидрации у не-Apple
+  const [key, setKey] = useState("⌘K");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    setKey(ckLabel());
+  }, []);
 
   const items = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -134,7 +141,7 @@ export default function CommandK({ t }: { t: CkT }) {
         aria-label={t.aria}
         onClick={() => setOpen(true)}
       >
-        ⌘K
+        {key}
       </button>
       {mounted &&
         open &&

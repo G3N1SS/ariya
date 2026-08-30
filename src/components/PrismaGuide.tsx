@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { withHotkey } from "@/lib/hotkey";
 
 const PrismaScene = dynamic(() => import("./three/PrismaScene"), {
   ssr: false,
@@ -50,7 +51,7 @@ export default function PrismaGuide({ t }: { t: GuideT }) {
 
   useEffect(() => {
     if (!mounted) return;
-    const hello = window.setTimeout(() => say("hello", t.hello), 900);
+    const hello = window.setTimeout(() => say("hello", withHotkey(t.hello)), 900);
 
     // реплики по секциям — по одной на визит
     const sections: [string, string][] = [
