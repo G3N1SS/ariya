@@ -273,6 +273,17 @@ export const dict = {
       backHref: "/en",
       releases: [
         {
+          v: "1.7",
+          date: "30.08.2026",
+          items: [
+            "“Who these three are” — prisma avatars and open team numbers",
+            "per-case OG cards for link previews, case shots in webp",
+            "desktop Lighthouse 100/100/100/100",
+            "hero and services copy rewritten in a human voice",
+            "Ctrl+K for non-Apple keyboards",
+          ],
+        },
+        {
           v: "1.6",
           date: "22.08.2026",
           items: [
@@ -743,6 +754,17 @@ export const dict = {
       back: "← на сайт",
       backHref: "/",
       releases: [
+        {
+          v: "1.7",
+          date: "30.08.2026",
+          items: [
+            "«Кто эти трое» — призмы-аватары и открытые цифры команды",
+            "OG-карточки кейсов для шарилок, кейс-скрины в webp",
+            "desktop Lighthouse 100/100/100/100",
+            "тексты хиро и услуг переписаны живым голосом",
+            "Ctrl+K для не-Apple клавиатур",
+          ],
+        },
         {
           v: "1.6",
           date: "22.08.2026",
