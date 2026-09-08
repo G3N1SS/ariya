@@ -8,13 +8,13 @@
 
 - Хостинг: Vercel, команда **koderiyo**, проект **ariya** (план Hobby)
 - Репозиторий: `github.com/G3N1SS/ariya`, автодеплой из ветки `main`
-- Прод-адрес: `https://<проект>.vercel.app` — до покупки домена (см. чек-лист переезда)
+- Прод-адрес: **https://ariya.tech** (домен на рег.ру, NS делегированы на Vercel: ns1/ns2.vercel-dns.com; www → 307 на корень; ariya-taupe.vercel.app остаётся запасным)
 
 ## Переменные окружения
 
 | Имя | Тип в Vercel | Значение / где взять |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Config | Полный адрес прода со схемой. Сейчас — vercel-адрес, после переезда — свой домен. Влияет на canonical, hreflang, OG, sitemap |
+| `NEXT_PUBLIC_SITE_URL` | Config | `https://ariya.tech`. Влияет на canonical, hreflang, OG, sitemap |
 | `TELEGRAM_BOT_TOKEN` | **Secret** | Токен бота **@AriyaTicketsBot**. Хранится в `site/.env.local` и Vercel. Восстановить: @BotFather → `/mybots` → бот → API Token |
 | `TELEGRAM_CHAT_ID` | Config | `-1003463858692` — супергруппа «кодеры йоу» |
 | `TELEGRAM_THREAD_ID` | Config | `1564` — тема «Заявки» в группе (без неё бот пишет в General) |
@@ -94,6 +94,6 @@ npx lighthouse https://АДРЕС/ --output html --view
 
 - [x] Бот заявок: создан, локально проверен, тема «Заявки»
 - [x] Env в Vercel + Redeploy + прод-тест формы (30.08: `{"ok":true}`, заявка в теме «Заявки»)
-- [ ] Свой домен (чек-лист выше)
+- [x] Свой домен: ariya.tech подключён (08.09.2026), форма проверена на нём боевой заявкой
 - [ ] Счётчик Метрики + цели
 - [ ] Почта студии → `contacts.email` в `src/lib/dict.ts` (кнопка в CTA появится сама)
